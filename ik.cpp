@@ -98,17 +98,19 @@ MatrixXf IK::jacobianInverse() {
     std::cout <<"Jacobian transpose:" <<  jacobianMatrx.transpose() << "\n";
     std::cout <<"jacobianMatrx * Jacobian transpose:" <<  jacobianMatrx * jacobianMatrx.transpose() << "\n";
     
-    Matrix2f jacobianMatrxInverse1 = jacobianMatrx * (jacobianMatrx.transpose());
+    MatrixXf jacobianMatrxInverse1 = MatrixXf::Zero(2,2);
+    
+    jacobianMatrxInverse1 = jacobianMatrx * (jacobianMatrx.transpose());
     
     std::cout <<"jacobianMatrxInverse1:" << jacobianMatrxInverse1 <<"\n";
     std::cout <<"jacobianMatrxInverse1:" << jacobianMatrxInverse1.inverse() <<"\n";
     
     Matrix2f A;
     
-    float m00 = float(jacobianMatrxInverse1(0,0));
-    float m01 = float(jacobianMatrxInverse1(0,1));
-    float m10 = float(jacobianMatrxInverse1(1,0));
-    float m11 = float(jacobianMatrxInverse1(1,1));
+    double m00 = double(jacobianMatrxInverse1(0,0));
+    double m01 = double(jacobianMatrxInverse1(0,1));
+    double m10 = double(jacobianMatrxInverse1(1,0));
+    double m11 = double(jacobianMatrxInverse1(1,1));
     
     A << m00, m01, m10, m11;
    // A << 0.357918, 0.116232, 0.116232, 0.0377455;
@@ -123,9 +125,9 @@ MatrixXf IK::jacobianInverse() {
     
     
     
-    std::cout <<"jacobianMatrxInverse:" << jacobianMatrxInverse <<"\n";
+    std::cout <<"jacobianMatrxInverse:" << jacobianMatrxInverse <<endl;
     
-    std::cout <<"jacobianMatrxInverse:" << jacobianMatrxInverse.inverse() <<"\n";
+    std::cout <<"jacobianMatrxInverse:" << jacobianMatrxInverse.inverse() <<endl;
     
     return (jacobianMatrx.transpose() * jacobianMatrxInverse);
 
