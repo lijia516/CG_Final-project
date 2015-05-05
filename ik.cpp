@@ -36,8 +36,8 @@ void IK::start(){
     
     mCurPosition = mStartPosition;
     
-    float x = (mGoalPostion(0) - mCurPosition(0)) * 1.0 / 28;
-    float y = (mGoalPostion(1) - mCurPosition(1)) * 1.0 / 28;
+    float x = (mGoalPostion(0) - mCurPosition(0)) * 1.0 / 10;
+    float y = (mGoalPostion(1) - mCurPosition(1)) * 1.0 / 10;
     
     
     std::cout <<"goal:" << mGoalPostion(0) << "," << mGoalPostion(1) << "\n";
@@ -48,7 +48,7 @@ void IK::start(){
     float mStep = 0.5;
 
     
-    while (!getGoal() && dt < 15) {
+    while (!getGoal() && dt < 19) {
         
         dt += 0.5;
         
@@ -59,7 +59,7 @@ void IK::start(){
         dxdy(1) = y;
         
         calculateAngles(dxdy);
-        app->GetUI()->m_pwndGraphWidget->AddCtrlPt(23, dt, mBodys[0]->mAngle);
+        app->GetUI()->m_pwndGraphWidget->AddCtrlPt(23, dt, mBodys[0]->mAngle * 180.0 / PI);
      //   app->GetUI()->m_pwndGraphWidget->AddCtrlPt(32, dt, mBodys[1]->mAngle);
         
         std::cout <<"angle1, angle2:" << mBodys[0]->mAngle << "\n";
@@ -75,59 +75,38 @@ MatrixXf IK::jacobianInverse() {
     
     MatrixXf jacobianMatrx = MatrixXf::Zero(2,mBodys.size());
     
+    
     for (int j = 0; j < mBodys.size(); j++) {
         
-        
         float angle = 0;
-        
         for (int i = 0; i < mBodys.size(); i++) {
             
             angle += mBodys[i]->mAngle;
             if (i >= j) {
                 
-                jacobianMatrx(0, j) += (-mBodys[i]->mLen * cos(PI - angle));
+                jacobianMatrx(0, j) += (float)(-mBodys[i]->mLen * cos(PI - angle));
                 
-                jacobianMatrx(1, j) += (mBodys[i]->mLen * sin(PI - angle));
+                jacobianMatrx(1, j) += (float)(mBodys[i]->mLen * sin(PI - angle));
                 
             }
         }
     }
-    
-    std::cout <<"cos:" <<  cos(PI) << "\n";
-    std::cout <<"Jacobian:" <<  jacobianMatrx << "\n";
-    std::cout <<"Jacobian transpose:" <<  jacobianMatrx.transpose() << "\n";
-    std::cout <<"jacobianMatrx * Jacobian transpose:" <<  jacobianMatrx * jacobianMatrx.transpose() << "\n";
+
     
     MatrixXf jacobianMatrxInverse1 = MatrixXf::Zero(2,2);
     
     jacobianMatrxInverse1 = jacobianMatrx * (jacobianMatrx.transpose());
     
-    std::cout <<"jacobianMatrxInverse1:" << jacobianMatrxInverse1 <<"\n";
-    std::cout <<"jacobianMatrxInverse1:" << jacobianMatrxInverse1.inverse() <<"\n";
     
-    Matrix2f A;
-    
-    double m00 = double(jacobianMatrxInverse1(0,0));
-    double m01 = double(jacobianMatrxInverse1(0,1));
-    double m10 = double(jacobianMatrxInverse1(1,0));
-    double m11 = double(jacobianMatrxInverse1(1,1));
-    
-    A << m00, m01, m10, m11;
-   // A << 0.357918, 0.116232, 0.116232, 0.0377455;
-    cout << "Here is the matrix A:\n" << A << endl;
-    cout << "The determinant of A is " << A.determinant() << endl;
-    cout << "The inverse of A is:\n" << A.inverse() << endl;
+    float m00 = roundf(jacobianMatrxInverse1(0,0) * 100000) / 100000.0;
+    float m01 = roundf(jacobianMatrxInverse1(0,1) * 100000) / 100000.0;
+    float m10 = roundf(jacobianMatrxInverse1(1,0) * 100000) / 100000.0;
+    float m11 = roundf(jacobianMatrxInverse1(1,1) * 100000) / 100000.0;
 
     
     Matrix2f jacobianMatrxInverse;
     
-    jacobianMatrxInverse << 0.357918, 0.116232, 0.116232, 0.0377455;
-    
-    
-    
-    std::cout <<"jacobianMatrxInverse:" << jacobianMatrxInverse <<endl;
-    
-    std::cout <<"jacobianMatrxInverse:" << jacobianMatrxInverse.inverse() <<endl;
+    jacobianMatrxInverse << m00, m01, m10, m11;
     
     return (jacobianMatrx.transpose() * jacobianMatrxInverse);
 
