@@ -48,6 +48,7 @@ void IK::start(){
     float mStep = 0.5;
 
     
+    app->GetUI()->m_pwndGraphWidget->ClearAllCtrlPt(23);
     while (!getGoal() && dt < 19) {
         
         dt += 0.5;
