@@ -112,6 +112,7 @@ public:
 	bool saveCameraScript(const char* szFileName) const;
 	bool loadCameraScript(const char* szFileName);
     void AddCtrlPt(int curveId, int x, int y);
+    void ClearAllCtrlPt(int curveId);
 
 	void zoomAll();
 

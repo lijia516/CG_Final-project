@@ -41,12 +41,19 @@ void IK::start(){
     
     
     float dt = 1;
-    float dx = 0.5;
-    float dy = 0.5;
+    
+    float dx;
+    float dy;
+    
+    dx = (mGoalPostion(0) - mCurPosition(0) > 1) ? 0.2 : -0.2;
+    dy = (mGoalPostion(1) - mCurPosition(1) > 1) ? 0.2 : -0.2;
+    
+    
     
     std::cout <<"dx, dy:" << dx << "," << dy << "\n";
 
     
+    app->GetUI()->m_pwndGraphWidget->ClearAllCtrlPt(23);
     while (!getGoal() && dt < 19) {
         
         dt += 0.5;
@@ -62,8 +69,8 @@ void IK::start(){
      // app->GetUI()->m_pwndGraphWidget->AddCtrlPt(32, dt, mBodys[1]->mAngle);
         
         
-        dx = (mGoalPostion(0) - mCurPosition(0) > 1) ? 0.5 : -0.5;
-        dy = (mGoalPostion(1) - mCurPosition(1) > 1) ? 0.5 : -0.5;
+        dx = (mGoalPostion(0) - mCurPosition(0) > 1) ? 0.2 : -0.2;
+        dy = (mGoalPostion(1) - mCurPosition(1) > 1) ? 0.2 : -0.2;
         
         
         std::cout <<"angle1, angle2:" << mBodys[0]->mAngle << "\n";
