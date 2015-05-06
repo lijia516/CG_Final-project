@@ -12,11 +12,11 @@ class body
 {
     
 public:
-    body(){ mLen = 0; mAngle = 0;};
-    body(float len, float angle){mLen = len; mAngle = angle;};
+    body(){ mLen = 0; mAngles.push_back(0); mAngles.push_back(0);};
+    body(float len, float angle_z, float angle_y){mLen = len; mAngles.push_back(angle_z); mAngles.push_back(angle_y);};
     
     float mLen;
-    float mAngle;
+    std::vector<float> mAngles;
     
 };
 
@@ -27,9 +27,9 @@ public:
    
     IK(){
     
-        mStartPosition = VectorXf::Zero(2, 1);
-        mCurPosition = VectorXf::Zero(2, 1);
-        mGoalPostion = VectorXf::Zero(2, 1);
+        mStartPosition = VectorXf::Zero(3, 1);
+        mCurPosition = VectorXf::Zero(3, 1);
+        mGoalPostion = VectorXf::Zero(3, 1);
     
     };
     void start();
@@ -37,12 +37,12 @@ public:
     VectorXf mStartPosition;
     VectorXf mCurPosition;
     VectorXf mGoalPostion;
-    VectorXf dxdy;
+    VectorXf dxdydz;
     
     
     MatrixXf jacobianInverse();
     
-    void calculateAngles(VectorXf dxdy);
+    void calculateAngles(VectorXf dxdydz);
     bool getGoal();
     
     std::vector<body*> mBodys;
