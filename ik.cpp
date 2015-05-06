@@ -40,13 +40,13 @@ void IK::start(){
     std::cout <<"cur:" << mCurPosition(0) << "," << mCurPosition(1) << "\n";
     
     
-    float dt = 1;
+    float dt = 0;
     
     float dx;
     float dy;
     
-    dx = (mGoalPostion(0) - mCurPosition(0) > 1) ? 0.2 : -0.2;
-    dy = (mGoalPostion(1) - mCurPosition(1) > 1) ? 0.2 : -0.2;
+    dx = (mGoalPostion(0) - mCurPosition(0) > 0.1) ? 0.1 : -0.1;
+    dy = (mGoalPostion(1) - mCurPosition(1) > 0.1) ? 0.1 : -0.1;
     
     
     
@@ -54,6 +54,8 @@ void IK::start(){
 
     
     app->GetUI()->m_pwndGraphWidget->ClearAllCtrlPt(23);
+    app->GetUI()->m_pwndGraphWidget->ClearAllCtrlPt(32);
+    
     while (!getGoal() && dt < 19) {
         
         dt += 0.5;
@@ -66,14 +68,14 @@ void IK::start(){
         
         calculateAngles(dxdy);
         app->GetUI()->m_pwndGraphWidget->AddCtrlPt(23, dt, mBodys[0]->mAngle * 180.0 / PI);
-     // app->GetUI()->m_pwndGraphWidget->AddCtrlPt(32, dt, mBodys[1]->mAngle);
+        app->GetUI()->m_pwndGraphWidget->AddCtrlPt(32, dt, mBodys[1]->mAngle * 180.0 / PI);
         
         
-        dx = (mGoalPostion(0) - mCurPosition(0) > 1) ? 0.2 : -0.2;
-        dy = (mGoalPostion(1) - mCurPosition(1) > 1) ? 0.2 : -0.2;
+        dx = (mGoalPostion(0) - mCurPosition(0) > 0.1) ? 0.1 : -0.1;
+        dy = (mGoalPostion(1) - mCurPosition(1) > 0.1) ? 0.1 : -0.1;
         
         
-        std::cout <<"angle1, angle2:" << mBodys[0]->mAngle << "\n";
+        std::cout <<"angle1, angle2:" << mBodys[0]->mAngle << "," << mBodys[1]->mAngle<<"\n";
 //"," << mBodys[1]->mAngle << "\n";
         
     }
@@ -109,10 +111,10 @@ MatrixXf IK::jacobianInverse() {
     jacobianMatrxInverse1 = jacobianMatrx * (jacobianMatrx.transpose());
     
     
-    float m00 = roundf(jacobianMatrxInverse1(0,0) * 100000) / 100000.0;
-    float m01 = roundf(jacobianMatrxInverse1(0,1) * 100000) / 100000.0;
-    float m10 = roundf(jacobianMatrxInverse1(1,0) * 100000) / 100000.0;
-    float m11 = roundf(jacobianMatrxInverse1(1,1) * 100000) / 100000.0;
+    float m00 = roundf(jacobianMatrxInverse1(0,0) * 1000000) / 1000000.0;
+    float m01 = roundf(jacobianMatrxInverse1(0,1) * 1000000) / 1000000.0;
+    float m10 = roundf(jacobianMatrxInverse1(1,0) * 1000000) / 1000000.0;
+    float m11 = roundf(jacobianMatrxInverse1(1,1) * 1000000) / 1000000.0;
 
     
     Matrix2f jacobianMatrxInverse;
@@ -140,6 +142,22 @@ void IK::calculateAngles(VectorXf dxdy) {
         mBodys[i]->mAngle += dAngles(i);
     }
     
+    
+    for (int i = 0; i < mBodys.size(); i++) {
+        
+        while (mBodys[i]->mAngle < -2 * PI) {
+            
+            mBodys[i]->mAngle += PI;
+        }
+        
+        while (mBodys[i]->mAngle > 2 * PI) {
+            
+            mBodys[i]->mAngle -= PI;
+        }
+    }
+    
+    
+    
     float angle = 0;
     mCurPosition(0) = ParticleSystem::cloth_start[0];
     mCurPosition(1) = ParticleSystem::cloth_start[1];
@@ -155,13 +173,12 @@ void IK::calculateAngles(VectorXf dxdy) {
 
 bool IK::getGoal() {
     
+    std::cout <<"fabs(mCurPosition(0) - mGoalPostion(0)):" << fabs(mCurPosition(0) - mGoalPostion(0)) << "\n";
     
-    if (fabs(mCurPosition(0) - mGoalPostion(0)) <= 0.5f && fabs(mCurPosition(1) - mGoalPostion(1)) <= 0.5f) {
-        
-        
-        std::cout <<"fabs(mCurPosition(0) - mGoalPostion(0)):" << fabs(mCurPosition(0) - mGoalPostion(0)) << "\n";
-        
-        std::cout <<"fabs(mCurPosition(1) - mGoalPostion(1)):" << fabs(mCurPosition(1) - mGoalPostion(1)) << "\n";
+    std::cout <<"fabs(mCurPosition(1) - mGoalPostion(1)):" << fabs(mCurPosition(1) - mGoalPostion(1)) << "\n";
+    
+    
+    if (fabs(mCurPosition(0) - mGoalPostion(0)) <= 0.1f && fabs(mCurPosition(1) - mGoalPostion(1)) <= 0.1f) {
         
         std::cout << "true \n";
         

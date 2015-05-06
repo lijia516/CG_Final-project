@@ -403,18 +403,18 @@ inline void ModelerUI::cb_addNewPt_i(Fl_Light_Button*, void*)
         
         IK* myik = new IK();
         
-        body* ls = new body(scapula_len + forearm_len * 1.0 /2 * 3, 3.14f/10);
+        body* ls = new body(bicep_len * 1.0 /2 * 3 * 2 , 3.14f/10);
         
-        std::cout <<"len: "<< scapula_len + forearm_len * 1.0 /2 * 3 <<"\n";
+        std::cout <<"len: "<< bicep_len/2 * 3 <<"\n";
         
         myik->mBodys.push_back(ls);
         
-      //  body* lf = new body(forearm_len/2 * 3, 0.0);
-      //  myik->mBodys.push_back(lf);
+        body* lf = new body(forearm_len * 1.0 / 2 * 3  * 2 + hand_len * 1.0 * 2, 3.14f/10);
+        myik->mBodys.push_back(lf);
         
         
-        myik->mGoalPostion(0) = 1.5;
-        myik->mGoalPostion(1) = 3;
+        myik->mGoalPostion(0) = -1;
+        myik->mGoalPostion(1) = 4;
         
         myik->mStartPosition(0) = ParticleSystem::particleOrigin_pony[0];
         myik->mStartPosition(1) = ParticleSystem::particleOrigin_pony[1];

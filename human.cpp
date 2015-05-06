@@ -196,7 +196,7 @@ void Human::draw()
     
     
     glPushMatrix();
-    glTranslated(1.5, 3, 0);
+    glTranslated(-1, 4, 0);
     drawSphere(0.1);
     glPopMatrix();
     
@@ -296,8 +296,7 @@ void Human::draw()
                         glPushMatrix();
                             glTranslatef( 0.6, 0.2, 0.0 );
                             scapula(1, 'l');
-                            Mat4f particleXform3 = matCamInverse * glGetMatrix(GL_MODELVIEW_MATRIX);
-                            ParticleSystem::cloth_start = particleXform3 * Vec4f(0,0,0,1);
+    
     
     
                                 glPushMatrix();
@@ -305,6 +304,9 @@ void Human::draw()
                                 glRotatef(lscapula_ry, 0.0, 1.0, 0.0 );
                                 glRotatef(lscapula_rz, 0.0, 0.0, 1.0 );
                                 bicep(lbicep_len);
+                                Mat4f particleXform3 = matCamInverse * glGetMatrix(GL_MODELVIEW_MATRIX);
+                                ParticleSystem::cloth_start = particleXform3 * Vec4f(0,0,0,1);
+    
                                 glTranslatef( 0.0, -lbicep_len, 0.0 );
                                     glPushMatrix();
                                         glTranslatef( 0.0, -0.8, 0.0 );
