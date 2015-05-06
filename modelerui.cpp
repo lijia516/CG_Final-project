@@ -413,7 +413,7 @@ inline void ModelerUI::cb_addNewPt_i(Fl_Light_Button*, void*)
       //  myik->mBodys.push_back(lf);
         
         
-        myik->mGoalPostion(0) = -3;
+        myik->mGoalPostion(0) = 1.5;
         myik->mGoalPostion(1) = 3;
         
         myik->mStartPosition(0) = ParticleSystem::particleOrigin_pony[0];

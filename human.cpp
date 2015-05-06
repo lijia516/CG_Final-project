@@ -196,8 +196,8 @@ void Human::draw()
     
     
     glPushMatrix();
-    glTranslated(-3, 3, 3);
-    drawSphere(0.5);
+    glTranslated(1.5, 3, 0);
+    drawSphere(0.1);
     glPopMatrix();
     
 
