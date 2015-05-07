@@ -83,12 +83,11 @@ void project ( int N, float * u, float * v, float * p, float * div )
 void dens_step ( int N, float * x, float * x0, float * u, float * v, float diff, float dt )
 {
 	int i,j;
-	for(i = 0; i < N*N;i++){
-		if(x[i] > 1)
-			printf("x:%d,%f\n",i,x[i]);
-	}
-
 	add_source ( N, x, x0, dt );
+	FOR_EACH_CELL
+	if(x0[IX(i,j)] > 1.0)
+		printf("%d,%d:%f\n",i,j,x[IX(i,j)]);
+	END_FOR
 	SWAP ( x0, x ); diffuse ( N, 0, x, x0, diff, dt );
 	SWAP ( x0, x ); advect ( N, 0, x, x0, u, v, dt );
 }

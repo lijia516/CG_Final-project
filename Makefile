@@ -2,33 +2,30 @@
 #  Makefile for fltk applications
 #
 
-LOCAL = /usr/local
+INCLUDE = -I/u/albertwj/lib -I/lusr/opt/fltk1.3-1.3.0/include
+LIBS = -L/lusr/opt/fltk1.3-1.3.0/lib -lfltk -lfltk_gl -lfltk_images -lGL -lGLU -ljpeg -lpng -lz
 
-FLTK = /opt/local
+CFLAGS = -g -std=c++11 $(INCLUDE) $(LIBS) 
+#CFLAGS = -O1 -std=c++11 $(INCLUDE) $(LIBS) 
 
-CC = c++
-
-INCLUDE = -I$(LOCAL)/include -I$(FLTK)/include
-LIBDIR = -L$(FLTK)/lib -L$(LOCAL)/lib -L$(FLTK)/X11/lib
-
-LDLIBS = -L/usr/local/lib/ -framework Carbon -framework ApplicationServices -framework Cocoa
-GLDLIBS = -framework AGL -framework OpenGL
-LIBS  = $(LDLIBS) $(GLDLIBS) -lfltk_gl -lfltk -lfltk_images -lfltk_forms -lfltk_jpeg -lpng -lm
-
-CFLAGS = -g
+CC = g++
 
 .SUFFIXES: .o .cpp .cxx
 
 .cpp.o: 
-	$(CC) $(CFLAGS) $(INCLUDE) -c -o $*.o $<
+	$(CC) $(CFLAGS) -c -o $*.o $<
+
+.cxx.o: 
+	$(CC) $(CFLAGS) -c -o $*.o $<
 
 ALL.O = bitmap.o camera.o color.o curve.o curveevaluator.o \
         graphwidget.o indicatorwindow.o linearcurveevaluator.o \
         modelerapp.o modelerdraw.o modelerui.o animatoruiwindows.o \
         modelerview.o particleSystem.o point.o \
         rect.o human.o rulerwindow.o beziercurveevaluator.o \
-	bsplinescurveevaluator.o catmullromcurveevaluator.o \
-	c2interpolatingcurveevaluator.o ik.o
+		bsplinescurveevaluator.o catmullromcurveevaluator.o \
+		c2interpolatingcurveevaluator.o ik.o solver.o
+
 
 animator: $(ALL.O)
 	$(CC) $(CFLAGS) -o $@ $(ALL.O) $(INCLUDE) $(LIBDIR) $(LIBS)
@@ -38,4 +35,3 @@ clean:
 
 clean_all:
 	rm -f $(ALL.O) animator
-

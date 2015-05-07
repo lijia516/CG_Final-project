@@ -65,12 +65,12 @@ class SmokeSystem{
 						for ( i=0 ; i <_size ; i++ ) {
 								u[i] = v[i] = u_prev[i] = v_prev[i] = dens[i] = dens_prev[i] = 0.0f;
 						}
-						u[N+20] = 20.0f;
-						v[N+20] = 20.0f;
-						dens[N+20] = 100.0f;
+						u[N+20] = 5.0f;
+						v[N+20] = 5.0f;
+						dens[N+20] = 200.0f;
 				}
 				void draw_smoke ( void );
-				void update_smoke(void);
+				void update_smoke(float dt);
 };
 
 class ParticleSystem {

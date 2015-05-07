@@ -1,6 +1,7 @@
 #ifndef IK_H_INCLUDED
 #define IK_H_INCLUDED
 
+#undef Success
 #include "curveevaluator.h"
 #include "Eigen/Dense"
 #include <vector>

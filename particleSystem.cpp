@@ -209,134 +209,145 @@ void ParticleSystem::resetSimulation(float t)
 void ParticleSystem::computeForcesAndUpdateParticles(float t)
 {
 		// TODO
-
-		//  std::cout <<"time: " << t << std::endl;
-		ss.update_smoke();
-
-		if (isSimulate()) {
-
-
-				if (t - time > 0.3) {
-
-						time = t;
-
-
-						//  if (bounceOff) {
-
-						//   particleNum = 5;
-						//  }
+		if(t- prevT > 0.03){
+				float deltaT = t - prevT;
+				ss.update_smoke(deltaT *5);
+				if( t - prevT > .04 )
+						printf("(!!) Dropped Frame %lf (!!)\n", t-prevT);
+				prevT = t;
+		}
+		return;
+				//  std::cout <<"time: " << t << std::endl;
+				/*
+				   if (isSimulate()) {
 
 
+				   if (t - time > 0.1) {
 
-						if  (particles.size() < particleNum) {
+				   time = t;
 
-								Particle* p = new Particle();
-								p->position = Vec3f(particleOrigin);
-								p->velocity = Vec3f(-1, -2, 0);
-								p->force = Vec3f(gravity);
-								particles.push_back(p);
-								particleReal++;
-						}
+
+				//  if (bounceOff) {
+
+				//   particleNum = 5;
+				//  }
+
+
+
+				if  (particles.size() < particleNum) {
+
+				Particle* p = new Particle();
+				p->position = Vec3f(particleOrigin);
+				p->velocity = Vec3f(-1, -2, 0);
+				p->force = Vec3f(gravity);
+				particles.push_back(p);
+				particleReal++;
 				}
+				}
+				else
+				return;
 
 				float deltaT = t - prevT;
+				cout << deltaT << endl;
+				ss.update_smoke(deltaT);
 
 				typedef vector<Particle*>::const_iterator iter;
 
 				for(iter i = particles.begin(); i != particles.end(); ++i) {
 
-						// F = 1/2 * C * S * V^2
-						Vec3f airResistance_cur = Vec3f(0,0,0);
+				// F = 1/2 * C * S * V^2
+				Vec3f airResistance_cur = Vec3f(0,0,0);
 
-						airResistance_cur[0] = 0.5 * airResistance * 4 * 3.1415926 * particleRadius * particleRadius * 0.5 * (*i)->velocity[0] * (*i)->velocity[0];
-						airResistance_cur[1] = 0.5 * airResistance * 4 * 3.1415926 * particleRadius * particleRadius * 0.5 * (*i)->velocity[1] * (*i)->velocity[1];
-						airResistance_cur[2] = 0.5 * airResistance * 4 * 3.1415926 * particleRadius * particleRadius * 0.5 * (*i)->velocity[2] * (*i)->velocity[2];
+				airResistance_cur[0] = 0.5 * airResistance * 4 * 3.1415926 * particleRadius * particleRadius * 0.5 * (*i)->velocity[0] * (*i)->velocity[0];
+				airResistance_cur[1] = 0.5 * airResistance * 4 * 3.1415926 * particleRadius * particleRadius * 0.5 * (*i)->velocity[1] * (*i)->velocity[1];
+				airResistance_cur[2] = 0.5 * airResistance * 4 * 3.1415926 * particleRadius * particleRadius * 0.5 * (*i)->velocity[2] * (*i)->velocity[2];
 
-						if ((*i)->velocity[0] > 0) {
+				if ((*i)->velocity[0] > 0) {
 
-								(*i)->force[0] -= airResistance_cur[0];
-						} else {
+				(*i)->force[0] -= airResistance_cur[0];
+				} else {
 
-								(*i)->force[0] += airResistance_cur[0];
-						}
+				(*i)->force[0] += airResistance_cur[0];
+				}
 
-						if ((*i)->velocity[1] > 0) {
+				if ((*i)->velocity[1] > 0) {
 
-								(*i)->force[1] -= airResistance_cur[1];
-						} else {
+				(*i)->force[1] -= airResistance_cur[1];
+				} else {
 
-								(*i)->force[1] += airResistance_cur[1];
-						}
+				(*i)->force[1] += airResistance_cur[1];
+				}
 
-						if ((*i)->velocity[2] > 0) {
+				if ((*i)->velocity[2] > 0) {
 
-								(*i)->force[2] -= airResistance_cur[2];
-						} else {
+				(*i)->force[2] -= airResistance_cur[2];
+				} else {
 
-								(*i)->force[2] += airResistance_cur[2];
-						}
-
-
-						(*i)->velocity[0] += (*i)->force[0] * 1.0 / (*i)->mass * deltaT * 0.1;
-						(*i)->velocity[1] += (*i)->force[1] * 1.0 / (*i)->mass * deltaT * 0.1;
-						(*i)->velocity[2] += (*i)->force[2] * 1.0 / (*i)->mass * deltaT * 0.1;
-
-						(*i)->position[0] += (*i)->velocity[0] * deltaT;
-						(*i)->position[1] += (*i)->velocity[1] * deltaT;
-						(*i)->position[2] += (*i)->velocity[2] * deltaT;
+				(*i)->force[2] += airResistance_cur[2];
+				}
 
 
-						if(bounceOff) {
+				(*i)->velocity[0] += (*i)->force[0] * 1.0 / (*i)->mass * deltaT * 0.1;
+				(*i)->velocity[1] += (*i)->force[1] * 1.0 / (*i)->mass * deltaT * 0.1;
+				(*i)->velocity[2] += (*i)->force[2] * 1.0 / (*i)->mass * deltaT * 0.1;
 
-								if ((*i)->position[1] < 0) {
-
-										float len = ((*i)->velocity).length();
-
-										Vec3f N = Vec3f(0,1,0);
-										Vec3f V = -1 * Vec3f((*i)->velocity);
-										V.normalize();
+		(*i)->position[0] += (*i)->velocity[0] * deltaT;
+		(*i)->position[1] += (*i)->velocity[1] * deltaT;
+		(*i)->position[2] += (*i)->velocity[2] * deltaT;
 
 
-										double NVv = N * V;
-										Vec3f R = N * 2 * NVv - V;
+		if(bounceOff) {
 
-										R.normalize();
+				if ((*i)->position[1] < 0) {
+
+						float len = ((*i)->velocity).length();
+
+						Vec3f N = Vec3f(0,1,0);
+						Vec3f V = -1 * Vec3f((*i)->velocity);
+						V.normalize();
 
 
-										(*i)->velocity[0] = len * R[0];
-										(*i)->velocity[1] = len * R[1];
-										(*i)->velocity[2] = len * R[2];
+						double NVv = N * V;
+						Vec3f R = N * 2 * NVv - V;
+
+						R.normalize();
 
 
-								}
-
-						}
+						(*i)->velocity[0] = len * R[0];
+						(*i)->velocity[1] = len * R[1];
+						(*i)->velocity[2] = len * R[2];
 
 
 				}
-
-				if (pipe) {
-
-						pipe_computeForcesAndUpdateParticles(t);
-				}
-
-				if (pony) {
-						ponyTail_computeForcesAndUpdateParticles(t);
-				}
-
-				if (cloth) {
-						cloth_computeForcesAndUpdateParticles(t);
-				}
-
-				bakeParticles(t);
 
 		}
 
-		// Debugging info
-		if( t - prevT > .04 )
-				printf("(!!) Dropped Frame %lf (!!)\n", t-prevT);
-		prevT = t;
+
 }
+
+if (pipe) {
+
+		pipe_computeForcesAndUpdateParticles(t);
+}
+
+if (pony) {
+		ponyTail_computeForcesAndUpdateParticles(t);
+}
+
+if (cloth) {
+		cloth_computeForcesAndUpdateParticles(t);
+}
+
+bakeParticles(t);
+
+}
+
+// Debugging info
+if( t - prevT > .04 )
+		printf("(!!) Dropped Frame %lf (!!)\n", t-prevT);
+		prevT = t;
+		*/
+		}
 
 
 /** Render particles */
@@ -1046,7 +1057,7 @@ void SmokeSystem::draw_smoke(void){
 		int i, j;
 		float x, y , z, h, d00, d01, d10, d11;
 
-		h = 3.0f/N;
+		h = 5.0f/N;
 		glDisable(GL_LIGHTING);
 
 		glBegin ( GL_QUADS );
@@ -1070,12 +1081,6 @@ void SmokeSystem::draw_smoke(void){
 						//glColor4f ( d10, d10, d10 ); glVertex3f ( x+h, y ,0);
 						//glColor4f ( d11, d11, d11 ); glVertex3f ( x+h, y+h ,0);
 						//glColor4f ( d01, d01, d01 ); glVertex3f ( x, y+h ,0);
-					//	glNormal3d( 1.0 ,0.0, 0.0);			// +x side
-					//	glColor4f(0.5,0.0,0.0,1.0) ; glVertex3f ( x, y ,z);
-					//	glColor4f(0.5,0.0,0.0,1.0) ; glVertex3f ( x+h, y ,-z);
-					//	glColor4f(0.5,0.0,0.0,1.0) ; glVertex3f ( x+h, y+h ,-z);
-					//	glColor4f(0.5,0.0,0.0,1.0) ; glVertex3f ( x, y+h ,z);
-		//			glColor3f(0.65,0.45,0.2);
 						glColor4f(0.5,0.0,0.0,0.2);
 
 						glNormal3d( 1.0 ,0.0, 0.0);			// +x side
@@ -1117,18 +1122,23 @@ void SmokeSystem::draw_smoke(void){
 		}
 
 		glEnd ();
-	glEnable(GL_LIGHTING);
+		glEnable(GL_LIGHTING);
 }
 
 
-void SmokeSystem::update_smoke(void){
+void SmokeSystem::update_smoke(float dt){
 		int i, j, size = (N+2)*(N+2);
+		FOR_EACH_CELL
+				dens_prev[IX(i,j)] = 0.0f;
+		END_FOR
+						u_prev[N+20] = 5.0f;
+						v_prev[N+20] = 5.0f;
+						dens_prev[N+20] = 200.0f;
 
 		vel_step ( N, u, v, u_prev, v_prev, visc, dt );
 		dens_step ( N, dens, dens_prev, u, v, diff, dt );
-
 		FOR_EACH_CELL
-			if(	dens[IX(i,j)] < 1.0f)
-				dens[IX(i,j)] = 0.0f;
+				if(	dens[IX(i,j)] < 1.0f)
+						dens[IX(i,j)] = 0.0f;
 		END_FOR
 }
