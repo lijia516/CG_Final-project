@@ -101,6 +101,9 @@ void ModelerView::draw()
 		glEnable( GL_LIGHT0 );
         glEnable( GL_LIGHT1 );
 		glEnable( GL_NORMALIZE );
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_BLEND);
+	//	glClearColor(0.0,0.0,0.0,0.0);
     }
 
   	glViewport( 0, 0, w(), h() );

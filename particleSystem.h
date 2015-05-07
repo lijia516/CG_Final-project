@@ -23,130 +23,169 @@
 
 
 class Particle {
-    
-public:
-    
-    Particle(): position(0,0,0),velocity(0,0,0),force(0,0,0),mass(1) {};
-    
-    Vec3f position;
-    Vec3f velocity;
-    Vec3f force;
-    float mass;
+
+		public:
+
+				Particle(): position(0,0,0),velocity(0,0,0),force(0,0,0),mass(1) {};
+
+				Vec3f position;
+				Vec3f velocity;
+				Vec3f force;
+				float mass;
 };
 
+class SmokeSystem{
+		public:
+				int N;
+				float dt, diff, visc;
+				float force, source;
+				int dvel;
+				float * u, * v, * u_prev, * v_prev;
+				float * dens, * dens_prev;
+				SmokeSystem(int size){
+						int i, _size=(size+2)*(size+2);
+						dt = 0.1f;
+						diff = 0.0f;
+						visc = 0.0f;
+						force = 5.0f;
+						source = 100.0f;
+						N = size;
+						u			= (float *) malloc ( _size*sizeof(float) );
+						v			= (float *) malloc ( _size*sizeof(float) );
+						u_prev		= (float *) malloc ( _size*sizeof(float) );
+						v_prev		= (float *) malloc ( _size*sizeof(float) );
+						dens		= (float *) malloc ( _size*sizeof(float) );	
+						dens_prev	= (float *) malloc ( _size*sizeof(float) );
 
+						if ( !u || !v || !u_prev || !v_prev || !dens || !dens_prev ) {
+								fprintf ( stderr, "cannot allocate data\n" );
+						}
+
+
+						for ( i=0 ; i <_size ; i++ ) {
+								u[i] = v[i] = u_prev[i] = v_prev[i] = dens[i] = dens_prev[i] = 0.0f;
+						}
+						u[N+20] = 20.0f;
+						v[N+20] = 20.0f;
+						dens[N+20] = 100.0f;
+				}
+				void draw_smoke ( void );
+				void update_smoke(void);
+};
 
 class ParticleSystem {
 
-public:
+		public:
 
-	/** Constructor **/
-	ParticleSystem();
+				/** Constructor **/
+				ParticleSystem();
 
-	/** Destructor **/
-	virtual ~ParticleSystem();
-
-	/** Simulation fxns **/
-	// This fxn should render all particles in the system,
-	// at current time t.
-	virtual void drawParticles(float t);
-
-	// This fxn should save the configuration of all particles
-	// at current time t.
-	virtual void bakeParticles(float t);
-
-	// This function should compute forces acting on all particles
-	// and update their state (pos and vel) appropriately.
-	virtual void computeForcesAndUpdateParticles(float t);
-
-	// This function should reset the system to its initial state.
-	// When you need to reset your simulation, PLEASE USE THIS FXN.
-	// It sets some state variables that the UI requires to properly
-	// update the display.  Ditto for the following two functions.
-	virtual void resetSimulation(float t);
-
-	// This function should start the simulation
-	virtual void startSimulation(float t);
-
-	// This function should stop the simulation
-	virtual void stopSimulation(float t);
-
-	// This function should clear out your data structure
-	// of baked particles (without leaking memory).
-	virtual void clearBaked();
-    
-    void ponyTail_computeForcesAndUpdateParticles(float t);
-    void cloth_computeForcesAndUpdateParticles(float t);
-    void pipe_computeForcesAndUpdateParticles(float t);
+				/** Destructor **/
+				virtual ~ParticleSystem();
+				SmokeSystem ss = SmokeSystem(64);
 
 
-	// These accessor fxns are implemented for you
-	float getBakeStartTime() { return bake_start_time; }
-	float getBakeEndTime() { return bake_end_time; }
-	float getBakeFps() { return bake_fps; }
-	bool isSimulate() { return simulate; }
-	bool isDirty() { return dirty; }
-	void setDirty(bool d) { dirty = d; }
+				/** Simulation fxns **/
+				// This fxn should render all particles in the system,
+				// at current time t.
+				virtual void drawParticles(float t);
 
-    static Vec4f particleOrigin;
-    static Vec4f particleOrigin_pipe;
-    static Vec4f particleOrigin_pony;
-    static Vec4f particleOrigin_cloth;
-    static bool pipe;
-    static bool pony;
-    static bool cloth;
-    static bool bounceOff;
-    static Vec4f cloth_start;
-    static Vec4f cloth_end;
-    
-    float time;
-    float time2;
-    
-protected:
-	
+				// This fxn should save the configuration of all particles
+				// at current time t.
+				virtual void bakeParticles(float t);
 
-	/** Some baking-related state **/
-	float bake_fps;						// frame rate at which simulation was baked
-	float bake_start_time;				// time at which baking started 
-										// These 2 variables are used by the UI for
-										// updating the grey indicator 
-	float bake_end_time;				// time at which baking ended
+				// This function should compute forces acting on all particles
+				// and update their state (pos and vel) appropriately.
+				virtual void computeForcesAndUpdateParticles(float t);
 
-	/** General state variables **/
-	bool simulate;						// flag for simulation mode
-	bool dirty;							// flag for updating ui (don't worry about this)
-    
-    
-    
-    /*** particles***/
-    
-    std::vector<Particle*> particles;
-    std::vector<Particle*> particles_pipe;
-    std::vector<Particle*> ponyTail_particles;
-    
-    Particle** cloth_particles;
-    
-//    std::vector<std::vector<Particle*> > bake_particles;
-    
-    
-    std::map<float, std::vector<Vec3f> > bake_particles;
-    std::map<float, std::vector<Vec3f> > bake_particlesPipe;
-    std::map<float, std::vector<Vec3f> > bake_particlesPony;
-    std::map<float, std::vector<Vec3f> > bake_particlesCloth;
-    
-    
-    static Vec3f gravity;
-    static float airResistance;
-    static float particleRadius;
-    static int particleNum;
-    static int particleReal;
-    static int particleNum_ponyTail;
-    static int particleNum_cloth_row;
-    static int particleNum_cloth_col;
-    static float spring_K;
-    static float spring_cloth_K;
-    static float deltaX;
-   
+				// This function should reset the system to its initial state.
+				// When you need to reset your simulation, PLEASE USE THIS FXN.
+				// It sets some state variables that the UI requires to properly
+				// update the display.  Ditto for the following two functions.
+				virtual void resetSimulation(float t);
+
+				// This function should start the simulation
+				virtual void startSimulation(float t);
+
+				// This function should stop the simulation
+				virtual void stopSimulation(float t);
+
+				// This function should clear out your data structure
+				// of baked particles (without leaking memory).
+				virtual void clearBaked();
+
+				void ponyTail_computeForcesAndUpdateParticles(float t);
+				void cloth_computeForcesAndUpdateParticles(float t);
+				void pipe_computeForcesAndUpdateParticles(float t);
+
+
+				// These accessor fxns are implemented for you
+				float getBakeStartTime() { return bake_start_time; }
+				float getBakeEndTime() { return bake_end_time; }
+				float getBakeFps() { return bake_fps; }
+				bool isSimulate() { return simulate; }
+				bool isDirty() { return dirty; }
+				void setDirty(bool d) { dirty = d; }
+
+				static Vec4f particleOrigin;
+				static Vec4f particleOrigin_pipe;
+				static Vec4f particleOrigin_pony;
+				static Vec4f particleOrigin_cloth;
+				static bool pipe;
+				static bool pony;
+				static bool cloth;
+				static bool bounceOff;
+				static Vec4f cloth_start;
+				static Vec4f cloth_end;
+
+				float time;
+				float time2;
+
+		protected:
+
+
+				/** Some baking-related state **/
+				float bake_fps;						// frame rate at which simulation was baked
+				float bake_start_time;				// time at which baking started 
+				// These 2 variables are used by the UI for
+				// updating the grey indicator 
+				float bake_end_time;				// time at which baking ended
+
+				/** General state variables **/
+				bool simulate;						// flag for simulation mode
+				bool dirty;							// flag for updating ui (don't worry about this)
+
+
+
+				/*** particles***/
+
+				std::vector<Particle*> particles;
+				std::vector<Particle*> particles_pipe;
+				std::vector<Particle*> ponyTail_particles;
+
+				Particle** cloth_particles;
+
+				//    std::vector<std::vector<Particle*> > bake_particles;
+
+
+				std::map<float, std::vector<Vec3f> > bake_particles;
+				std::map<float, std::vector<Vec3f> > bake_particlesPipe;
+				std::map<float, std::vector<Vec3f> > bake_particlesPony;
+				std::map<float, std::vector<Vec3f> > bake_particlesCloth;
+
+
+				static Vec3f gravity;
+				static float airResistance;
+				static float particleRadius;
+				static int particleNum;
+				static int particleReal;
+				static int particleNum_ponyTail;
+				static int particleNum_cloth_row;
+				static int particleNum_cloth_col;
+				static float spring_K;
+				static float spring_cloth_K;
+				static float deltaX;
+
 
 };
 

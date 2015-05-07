@@ -376,9 +376,8 @@ void Human::draw()
     
     glPopMatrix();
     
-    
-
-    
+		ParticleSystem *ps = ModelerApplication::Instance()->GetParticleSystem();
+		ps->ss.draw_smoke();
     
   //  std::cout<<"ori:" << ParticleSystem::particleOrigin[0] << "," << ParticleSystem::particleOrigin[1] << "," << ParticleSystem::particleOrigin[2] << std::endl;
 
@@ -728,8 +727,8 @@ int main()
 	// call ModelerApplication::Instance()->SetParticleSystem(ps)
 	// to hook it up to the animator interface.
 
-  //  ParticleSystem *ps = new ParticleSystem();
-  //  ModelerApplication::Instance()->SetParticleSystem(ps);
+	ParticleSystem *ps = new ParticleSystem();
+    ModelerApplication::Instance()->SetParticleSystem(ps);
     
     
     ModelerApplication::Instance()->Init(&createHuman, controls, NUMCONTROLS);
