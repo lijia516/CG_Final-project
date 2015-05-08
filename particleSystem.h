@@ -16,6 +16,7 @@
 #ifndef __PARTICLE_SYSTEM_H__
 #define __PARTICLE_SYSTEM_H__
 
+#define IX(i,j,k) (i*(N+2)*(N+2)+ j*(N+2) +k)
 #include "vec.h"
 
 #include <vector>
@@ -41,19 +42,22 @@ class SmokeSystem{
 				float force, source;
 				int dvel;
 				float * u, * v, * u_prev, * v_prev;
+				float * w, * w_prev;
 				float * dens, * dens_prev;
 				SmokeSystem(int size){
-						int i, _size=(size+2)*(size+2);
+						int i, _size=(size+2)*(size+2)*(size+2);
 						dt = 0.1f;
 						diff = 0.0f;
 						visc = 0.0f;
 						force = 5.0f;
-						source = 100.0f;
+						source = 10.0f;
 						N = size;
 						u			= (float *) malloc ( _size*sizeof(float) );
 						v			= (float *) malloc ( _size*sizeof(float) );
+						w			= (float *) malloc ( _size*sizeof(float) );
 						u_prev		= (float *) malloc ( _size*sizeof(float) );
 						v_prev		= (float *) malloc ( _size*sizeof(float) );
+						w_prev		= (float *) malloc ( _size*sizeof(float) );
 						dens		= (float *) malloc ( _size*sizeof(float) );	
 						dens_prev	= (float *) malloc ( _size*sizeof(float) );
 
@@ -64,10 +68,12 @@ class SmokeSystem{
 
 						for ( i=0 ; i <_size ; i++ ) {
 								u[i] = v[i] = u_prev[i] = v_prev[i] = dens[i] = dens_prev[i] = 0.0f;
+								w[i] = w_prev[i] = 0.0f;
 						}
-						u[N+20] = 5.0f;
-						v[N+20] = 5.0f;
-						dens[N+20] = 200.0f;
+						u[IX(1,1,1)] = 1.0f;
+						v[IX(1,1,1)] = 1.0f;
+						w[IX(1,1,1)] = 1.0f;
+						dens[IX(1,1,1)] = 10.0f;
 				}
 				void draw_smoke ( void );
 				void update_smoke(float dt);
@@ -82,7 +88,7 @@ class ParticleSystem {
 
 				/** Destructor **/
 				virtual ~ParticleSystem();
-				SmokeSystem ss = SmokeSystem(64);
+				SmokeSystem ss = SmokeSystem(10);
 
 
 				/** Simulation fxns **/

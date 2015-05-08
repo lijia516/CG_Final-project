@@ -9,12 +9,13 @@
 #include <cmath>
 #include <vector>
 #include <map>
-#define IX(i,j) ((i)+(N+2)*(j))
-#define FOR_EACH_CELL for ( i=1 ; i<=N ; i++ ) { for ( j=1 ; j<=N ; j++ ) {
-#define END_FOR }}
+#define IX(i,j,k) (i*(N+2)*(N+2)+ j*(N+2) +k)
+#define SWAP(x0,x) {float * tmp=x0;x0=x;x=tmp;}
+#define FOR_EACH_CELL for ( i=1 ; i<=N ; i++ ) { for ( j=1 ; j<=N ; j++ ) { for ( k=1;k<=N; k++){
+#define END_FOR }}}
 
-extern void dens_step ( int N, float * x, float * x0, float * u, float * v, float diff, float dt );
-extern void vel_step ( int N, float * u, float * v, float * u0, float * v0, float visc, float dt );
+extern void dens_step ( int N, float * x, float * x0, float * u, float * v, float * w, float diff, float dt );
+extern void vel_step ( int N, float * u, float * v, float *w, float * u0, float * v0, float *w0,float visc, float dt );
 
 #include <FL/gl.h>
 
@@ -217,79 +218,79 @@ void ParticleSystem::computeForcesAndUpdateParticles(float t)
 				prevT = t;
 		}
 		return;
-				//  std::cout <<"time: " << t << std::endl;
-				/*
-				   if (isSimulate()) {
+		//  std::cout <<"time: " << t << std::endl;
+		/*
+		   if (isSimulate()) {
 
 
-				   if (t - time > 0.1) {
+		   if (t - time > 0.1) {
 
-				   time = t;
-
-
-				//  if (bounceOff) {
-
-				//   particleNum = 5;
-				//  }
+		   time = t;
 
 
+		//  if (bounceOff) {
 
-				if  (particles.size() < particleNum) {
-
-				Particle* p = new Particle();
-				p->position = Vec3f(particleOrigin);
-				p->velocity = Vec3f(-1, -2, 0);
-				p->force = Vec3f(gravity);
-				particles.push_back(p);
-				particleReal++;
-				}
-				}
-				else
-				return;
-
-				float deltaT = t - prevT;
-				cout << deltaT << endl;
-				ss.update_smoke(deltaT);
-
-				typedef vector<Particle*>::const_iterator iter;
-
-				for(iter i = particles.begin(); i != particles.end(); ++i) {
-
-				// F = 1/2 * C * S * V^2
-				Vec3f airResistance_cur = Vec3f(0,0,0);
-
-				airResistance_cur[0] = 0.5 * airResistance * 4 * 3.1415926 * particleRadius * particleRadius * 0.5 * (*i)->velocity[0] * (*i)->velocity[0];
-				airResistance_cur[1] = 0.5 * airResistance * 4 * 3.1415926 * particleRadius * particleRadius * 0.5 * (*i)->velocity[1] * (*i)->velocity[1];
-				airResistance_cur[2] = 0.5 * airResistance * 4 * 3.1415926 * particleRadius * particleRadius * 0.5 * (*i)->velocity[2] * (*i)->velocity[2];
-
-				if ((*i)->velocity[0] > 0) {
-
-				(*i)->force[0] -= airResistance_cur[0];
-				} else {
-
-				(*i)->force[0] += airResistance_cur[0];
-				}
-
-				if ((*i)->velocity[1] > 0) {
-
-				(*i)->force[1] -= airResistance_cur[1];
-				} else {
-
-				(*i)->force[1] += airResistance_cur[1];
-				}
-
-				if ((*i)->velocity[2] > 0) {
-
-				(*i)->force[2] -= airResistance_cur[2];
-				} else {
-
-				(*i)->force[2] += airResistance_cur[2];
-				}
+		//   particleNum = 5;
+		//  }
 
 
-				(*i)->velocity[0] += (*i)->force[0] * 1.0 / (*i)->mass * deltaT * 0.1;
-				(*i)->velocity[1] += (*i)->force[1] * 1.0 / (*i)->mass * deltaT * 0.1;
-				(*i)->velocity[2] += (*i)->force[2] * 1.0 / (*i)->mass * deltaT * 0.1;
+
+		if  (particles.size() < particleNum) {
+
+		Particle* p = new Particle();
+		p->position = Vec3f(particleOrigin);
+		p->velocity = Vec3f(-1, -2, 0);
+		p->force = Vec3f(gravity);
+		particles.push_back(p);
+		particleReal++;
+		}
+		}
+		else
+		return;
+
+		float deltaT = t - prevT;
+		cout << deltaT << endl;
+		ss.update_smoke(deltaT);
+
+		typedef vector<Particle*>::const_iterator iter;
+
+		for(iter i = particles.begin(); i != particles.end(); ++i) {
+
+		// F = 1/2 * C * S * V^2
+		Vec3f airResistance_cur = Vec3f(0,0,0);
+
+		airResistance_cur[0] = 0.5 * airResistance * 4 * 3.1415926 * particleRadius * particleRadius * 0.5 * (*i)->velocity[0] * (*i)->velocity[0];
+		airResistance_cur[1] = 0.5 * airResistance * 4 * 3.1415926 * particleRadius * particleRadius * 0.5 * (*i)->velocity[1] * (*i)->velocity[1];
+		airResistance_cur[2] = 0.5 * airResistance * 4 * 3.1415926 * particleRadius * particleRadius * 0.5 * (*i)->velocity[2] * (*i)->velocity[2];
+
+		if ((*i)->velocity[0] > 0) {
+
+		(*i)->force[0] -= airResistance_cur[0];
+		} else {
+
+		(*i)->force[0] += airResistance_cur[0];
+		}
+
+		if ((*i)->velocity[1] > 0) {
+
+		(*i)->force[1] -= airResistance_cur[1];
+		} else {
+
+		(*i)->force[1] += airResistance_cur[1];
+		}
+
+		if ((*i)->velocity[2] > 0) {
+
+		(*i)->force[2] -= airResistance_cur[2];
+		} else {
+
+		(*i)->force[2] += airResistance_cur[2];
+		}
+
+
+		(*i)->velocity[0] += (*i)->force[0] * 1.0 / (*i)->mass * deltaT * 0.1;
+		(*i)->velocity[1] += (*i)->force[1] * 1.0 / (*i)->mass * deltaT * 0.1;
+		(*i)->velocity[2] += (*i)->force[2] * 1.0 / (*i)->mass * deltaT * 0.1;
 
 		(*i)->position[0] += (*i)->velocity[0] * deltaT;
 		(*i)->position[1] += (*i)->velocity[1] * deltaT;
@@ -1054,8 +1055,10 @@ void ParticleSystem::pipe_computeForcesAndUpdateParticles(float t){
 }
 
 void SmokeSystem::draw_smoke(void){
-		int i, j;
-		float x, y , z, h, d00, d01, d10, d11;
+		int i, j,k;
+		float x, y , z, h;
+		float d[8];
+
 
 		h = 5.0f/N;
 		glDisable(GL_LIGHTING);
@@ -1066,58 +1069,74 @@ void SmokeSystem::draw_smoke(void){
 				x = (i-0.5f)*h;
 				for ( j=0 ; j<=N ; j++ ) {
 						y = (j-0.5f)*h;
+						for(k = 0; k <= N; k++){
+								z = (k -0.5f)*h;
+								d[0] = dens[IX(i,j,k)];
+								d[1] = dens[IX(i,j,k-1)];
+								d[2] = dens[IX(i,j+1,k-1)];
+								d[3] = dens[IX(i,j+1,k)];
+								d[4] = dens[IX(i-1,j,k)];
+								d[5] = dens[IX(i-1,j,k-1)];
+								d[6] = dens[IX(i-1,j+1,k-1)];
+								d[7] = dens[IX(i-1,j+1,k)];
+								int t;
+								for(t=0;t<8;t++)
+										if(d[t] > 0.05)
+												break;
+								if(t >= 8)
+										continue;
+								//	d000 = dens[IX(i,j)];
+								//	d001 = dens[IX(i,j+1)];
+								//	d0 = dens[IX(i+1,j)];
+								//	d11 = dens[IX(i+1,j+1)];
+								//	if(d00 < 0.05 && d01 < 0.05 && d10 < 0.05 && d11 < 0.05)
+								//			continue;
+								//	d00 = 1.0;
+								//	d01 = 1.0;
+								//	d11 = 1.0;
+								//	d10 = 1.0;
+								//glColor4f ( d00, d00, d00 ); glVertex3f ( x, y ,0);
+								//glColor4f ( d10, d10, d10 ); glVertex3f ( x+h, y ,0);
+								//glColor4f ( d11, d11, d11 ); glVertex3f ( x+h, y+h ,0);
+								//glColor4f ( d01, d01, d01 ); glVertex3f ( x, y+h ,0);
+								glColor4f(0.5,0.0,0.0,0.2);
 
-						d00 = dens[IX(i,j)];
-						d01 = dens[IX(i,j+1)];
-						d10 = dens[IX(i+1,j)];
-						d11 = dens[IX(i+1,j+1)];
-						if(d00 < 0.05 && d01 < 0.05 && d10 < 0.05 && d11 < 0.05)
-								continue;
-						d00 = 1.0;
-						d01 = 1.0;
-						d11 = 1.0;
-						d10 = 1.0;
-						//glColor4f ( d00, d00, d00 ); glVertex3f ( x, y ,0);
-						//glColor4f ( d10, d10, d10 ); glVertex3f ( x+h, y ,0);
-						//glColor4f ( d11, d11, d11 ); glVertex3f ( x+h, y+h ,0);
-						//glColor4f ( d01, d01, d01 ); glVertex3f ( x, y+h ,0);
-						glColor4f(0.5,0.0,0.0,0.2);
+								glNormal3d( 1.0 ,0.0, 0.0);			// +x side
+								glVertex3d( x, y, z);
+								glVertex3d( x, y, z-h);
+								glVertex3d( x,  y+h,z-h);
+								glVertex3d( x,  y+h, z);
 
-						glNormal3d( 1.0 ,0.0, 0.0);			// +x side
-						glVertex3d( x, y, z);
-						glVertex3d( x, y, z-h);
-						glVertex3d( x,  y+h,z-h);
-						glVertex3d( x,  y+h, z);
+								glNormal3d( 0.0 ,0.0, -1.0);		// -z side
+								glVertex3d( x, y, z-h);
+								glVertex3d( x-h,y,z-h);
+								glVertex3d( x-h,  y+h,z-h);
+								glVertex3d( x,  y+h,z-h);
 
-						glNormal3d( 0.0 ,0.0, -1.0);		// -z side
-						glVertex3d( x, y, z-h);
-						glVertex3d( x-h,y,z-h);
-						glVertex3d( x-h,  y+h,z-h);
-						glVertex3d( x,  y+h,z-h);
+								glNormal3d(-1.0, 0.0, 0.0);			// -x side
+								glVertex3d(x-h,y,z-h);
+								glVertex3d(x-h,y, z);
+								glVertex3d(x-h, y+h , z);
+								glVertex3d(x-h, y+h,z-h);
 
-						glNormal3d(-1.0, 0.0, 0.0);			// -x side
-						glVertex3d(x-h,y,z-h);
-						glVertex3d(x-h,y, z);
-						glVertex3d(x-h, y+h , z);
-						glVertex3d(x-h, y+h,z-h);
+								glNormal3d( 0.0, 0.0, 1.0);			// +z side
+								glVertex3d(x-h,y, z);
+								glVertex3d( x,y, z);
+								glVertex3d( x,  y+h, z);
+								glVertex3d(x-h,  y+h, z);
 
-						glNormal3d( 0.0, 0.0, 1.0);			// +z side
-						glVertex3d(x-h,y, z);
-						glVertex3d( x,y, z);
-						glVertex3d( x,  y+h, z);
-						glVertex3d(x-h,  y+h, z);
+								glNormal3d( 0.0, 1.0, 0.0);			// top (+y)
+								glVertex3d( x, y+ h, z);
+								glVertex3d( x, y+ h,z-h);
+								glVertex3d(x-h, y+ h,z-h);
+								glVertex3d(x-h, y+ h, z);
 
-						glNormal3d( 0.0, 1.0, 0.0);			// top (+y)
-						glVertex3d( x, y+ h, z);
-						glVertex3d( x, y+ h,z-h);
-						glVertex3d(x-h, y+ h,z-h);
-						glVertex3d(x-h, y+ h, z);
-
-						glNormal3d( 0.0,-1.0, 0.0);			// bottom (-y)
-						glVertex3d( x,y, z);
-						glVertex3d(x-h,y, z);
-						glVertex3d(x-h,y,z-h);
-						glVertex3d( x,y,z-h);
+								glNormal3d( 0.0,-1.0, 0.0);			// bottom (-y)
+								glVertex3d( x,y, z);
+								glVertex3d(x-h,y, z);
+								glVertex3d(x-h,y,z-h);
+								glVertex3d( x,y,z-h);
+						}
 				}
 		}
 
@@ -1127,18 +1146,30 @@ void SmokeSystem::draw_smoke(void){
 
 
 void SmokeSystem::update_smoke(float dt){
-		int i, j, size = (N+2)*(N+2);
+		int i, j,k, size = (N+2)*(N+2) *(N+2);
 		FOR_EACH_CELL
-				dens_prev[IX(i,j)] = 0.0f;
+				dens_prev[IX(i,j,k)] = 0.0f;
+				u_prev[IX(i,j,k)] = 0.0f;
+				v_prev[IX(i,j,k)] = 0.0f;
+				w_prev[IX(i,j,k)] = 0.0f;
 		END_FOR
-						u_prev[N+20] = 5.0f;
-						v_prev[N+20] = 5.0f;
-						dens_prev[N+20] = 200.0f;
+		//u_prev[IX(1,1,1)] = 0.0f;
+		//v_prev[IX(1,1,1)] = 0.0f;
+		//w_prev[IX(1,1,1)] = 1.0f;
+		dens_prev[IX(1,1,1)] = 10.0f;
 
-		vel_step ( N, u, v, u_prev, v_prev, visc, dt );
-		dens_step ( N, dens, dens_prev, u, v, diff, dt );
+		vel_step ( N, u, v, w, u_prev, v_prev, w_prev ,visc, dt);
+		dens_step ( N, dens, dens_prev, u, v, w, diff, dt );
 		FOR_EACH_CELL
-				if(	dens[IX(i,j)] < 1.0f)
-						dens[IX(i,j)] = 0.0f;
+				if(	dens[IX(i,j,k)] < 1.0f)
+						dens[IX(i,j,k)] = 0.0f;
 		END_FOR
+	//FOR_EACH_CELL
+	//if(dens[IX(i,j,k)] > 1.0)
+	//	printf("%d,%d%d:%f\n",i,j,k,dens[IX(i,j,k)]);
+	//if(u[IX(i,j,k)] > 1.0)
+	//	printf("u:%d,%d,%d:%f\n",i,j,k,u[IX(i,j,k)]);
+	//if(v[IX(i,j,k)] > 1.0)
+	//	printf("v:%d,%d,%d:%f\n",i,j,k,v[IX(i,j,k)]);
+	//END_FOR
 }
