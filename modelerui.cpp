@@ -410,7 +410,7 @@ inline void ModelerUI::cb_addNewPt_i(Fl_Light_Button*, void*)
         myik->mBodys.push_back(lf);
         
         
-        myik->mGoalPostion(0) = -1;
+        myik->mGoalPostion(0) = 3.5;
         myik->mGoalPostion(1) = 5;
         myik->mGoalPostion(2) = -1;
         

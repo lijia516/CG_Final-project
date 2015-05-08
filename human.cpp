@@ -196,23 +196,10 @@ void Human::draw()
     
     
     glPushMatrix();
-    glTranslated(-1, 5, -1);
+    glTranslated(3.5, 5, -1);
     drawSphere(0.1);
     glPopMatrix();
     
-    
-    // arm start
-    glPushMatrix();
-    glTranslated(0.33282,3.65,-0.49923);
-    drawSphere(0.1);
-    glPopMatrix();
-
-    
-    // hand start
-    glPushMatrix();
-    glTranslated(0.33282, 1.97, -0.49923);
-    drawSphere(0.1);
-    glPopMatrix();
     
 
 	// define the model
@@ -221,7 +208,7 @@ void Human::draw()
     
     glRotatef( twist, 1, 1, 1 );
 
-    glTranslatef( 0.0, 2.45, 0.0 );
+    glTranslatef( 5, 2.45, 0.0 );
     
     glPushMatrix();
     

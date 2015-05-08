@@ -85,7 +85,7 @@ void IK::start(){
     
     while (!getGoal() && dt < 19) {
         
-        dt += 0.5u;
+        dt += 0.5;
         
         std::cout <<"dt: "<< dt <<"\n";
         
@@ -388,9 +388,9 @@ void IK::updateArmPosition() {
     
     Vector2f newArmDir = rotateMatrix * newPelDir;
     
-    mArmStartPostion(0) = newArmDir(0) * 0.6;
+    mArmStartPostion(0) = newArmDir(0) * 0.6 + mPelPostion(0);
     mArmStartPostion(1) = mPelPostion(1) + 1.2;
-    mArmStartPostion(2) = newArmDir(1) * 0.6;
+    mArmStartPostion(2) = newArmDir(1) * 0.6 + mPelPostion(2);
     
     std::cout <<"new mArmStartPostion:" << mArmStartPostion(0) << "," << mArmStartPostion(1) << "," << mArmStartPostion(2) << "\n";
     
