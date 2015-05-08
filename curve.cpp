@@ -184,6 +184,10 @@ void Curve::addControlPoint(const Point& point)
 	sortControlPoints();
 	m_bDirty = true;
 }
+void Curve::clearControlPoint(){
+		m_ptvCtrlPts.clear();
+		m_bDirty = true;
+}
 
 void Curve::removeControlPoint(const int iCtrlPt)
 {

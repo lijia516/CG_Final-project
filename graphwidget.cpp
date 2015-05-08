@@ -1194,6 +1194,10 @@ Point GraphWidget::gridToWindow( Point p ) {
 	return val;
 }
 
+void GraphWidget::ClearAllCtrlPt(int curveId){
+        m_pcrvvCurves[curveId]->clearControlPoint();
+}
+
 void GraphWidget::AddCtrlPt(int curveId, int x, int y)
 {
     if (curveId >= 0) {
@@ -1203,4 +1207,3 @@ void GraphWidget::AddCtrlPt(int curveId, int x, int y)
         m_pcrvvCurves[curveId]->addControlPoint(ptMouseInCurveCoord);
     }
 }
-

@@ -25,6 +25,7 @@ public:
 	float evaluateCurveAt(const float x) const;
 	void scaleX(const float fScale);
 	void addControlPoint(const Point& point);
+	void clearControlPoint();
 	void removeControlPoint(const int iCtrlPt);
 	void removeControlPoint2(const int iCtrlPt);
 	void removeControlPointsInRange(const float fMinX, const float fMaxX);

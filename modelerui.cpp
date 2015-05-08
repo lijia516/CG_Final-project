@@ -403,21 +403,33 @@ inline void ModelerUI::cb_addNewPt_i(Fl_Light_Button*, void*)
         
         IK* myik = new IK();
         
-        body* ls = new body(scapula_len + forearm_len * 1.0 /2 * 3, 3.14f/10);
-        
-        std::cout <<"len: "<< scapula_len + forearm_len * 1.0 /2 * 3 <<"\n";
-        
+        body* ls = new body(bicep_len * 1.0 /2 * 3 * 2, 3.14f/10, 3.14f/10);
         myik->mBodys.push_back(ls);
         
-      //  body* lf = new body(forearm_len/2 * 3, 0.0);
-      //  myik->mBodys.push_back(lf);
+        body* lf = new body(forearm_len * 1.0 / 2 * 3  * 2 + hand_len * 1.0 * 2, 3.14f/10, 3.14f/10);
+        myik->mBodys.push_back(lf);
         
         
-        myik->mGoalPostion(0) = -3;
-        myik->mGoalPostion(1) = 3;
+        myik->mGoalPostion(0) = -1;
+        myik->mGoalPostion(1) = 5;
+        myik->mGoalPostion(2) = -1;
         
-        myik->mStartPosition(0) = ParticleSystem::particleOrigin_pony[0];
-        myik->mStartPosition(1) = ParticleSystem::particleOrigin_pony[1];
+        myik->mCurPosition(0) = ParticleSystem::particleOrigin_pony[0];
+        myik->mCurPosition(1) = ParticleSystem::particleOrigin_pony[1];
+        myik->mCurPosition(2) = ParticleSystem::particleOrigin_pony[2];
+        
+        myik->mArmStartPostion(0) = ParticleSystem::cloth_start[0];
+        myik->mArmStartPostion(1) = ParticleSystem::cloth_start[1];
+        myik->mArmStartPostion(2) = ParticleSystem::cloth_start[2];
+        
+        myik->headDirction(0) = 0.0f;
+        myik->headDirction(1) = 0.0f;
+        myik->headDirction(2) = -1.0f;
+        
+        myik->mPelPostion(0) = ParticleSystem::pelvisPosition[0];
+        myik->mPelPostion(1) = ParticleSystem::pelvisPosition[1];
+        myik->mPelPostion(2) = ParticleSystem::pelvisPosition[2];
+        
         
         myik->start();
         

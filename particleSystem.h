@@ -98,6 +98,7 @@ public:
     static bool bounceOff;
     static Vec4f cloth_start;
     static Vec4f cloth_end;
+    static Vec4f pelvisPosition;
     
     float time;
     float time2;

@@ -196,8 +196,22 @@ void Human::draw()
     
     
     glPushMatrix();
-    glTranslated(-3, 3, 3);
-    drawSphere(0.5);
+    glTranslated(-1, 5, -1);
+    drawSphere(0.1);
+    glPopMatrix();
+    
+    
+    // arm start
+    glPushMatrix();
+    glTranslated(0.33282,3.65,-0.49923);
+    drawSphere(0.1);
+    glPopMatrix();
+
+    
+    // hand start
+    glPushMatrix();
+    glTranslated(0.33282, 1.97, -0.49923);
+    drawSphere(0.1);
     glPopMatrix();
     
 
@@ -214,6 +228,11 @@ void Human::draw()
         glTranslatef( 0.0, thigh_exlen, 0.0 );
         glRotatef(pelvis_r, 0.0, 1.0, 0.0 );
         pelvis(1);
+    
+        Mat4f particleXformPel = matCamInverse * glGetMatrix(GL_MODELVIEW_MATRIX);
+        ParticleSystem::pelvisPosition = particleXformPel * Vec4f(0,0,0,1);
+    
+    
     
             // left leg and foot
             glPushMatrix();
@@ -296,8 +315,7 @@ void Human::draw()
                         glPushMatrix();
                             glTranslatef( 0.6, 0.2, 0.0 );
                             scapula(1, 'l');
-                            Mat4f particleXform3 = matCamInverse * glGetMatrix(GL_MODELVIEW_MATRIX);
-                            ParticleSystem::cloth_start = particleXform3 * Vec4f(0,0,0,1);
+    
     
     
                                 glPushMatrix();
@@ -305,6 +323,9 @@ void Human::draw()
                                 glRotatef(lscapula_ry, 0.0, 1.0, 0.0 );
                                 glRotatef(lscapula_rz, 0.0, 0.0, 1.0 );
                                 bicep(lbicep_len);
+                                Mat4f particleXform3 = matCamInverse * glGetMatrix(GL_MODELVIEW_MATRIX);
+                                ParticleSystem::cloth_start = particleXform3 * Vec4f(0,0,0,1);
+    
                                 glTranslatef( 0.0, -lbicep_len, 0.0 );
                                     glPushMatrix();
                                         glTranslatef( 0.0, -0.8, 0.0 );
