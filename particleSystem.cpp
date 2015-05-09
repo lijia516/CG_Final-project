@@ -9,13 +9,12 @@
 #include <cmath>
 #include <vector>
 #include <map>
-#define IX(i,j,k) (i*(N+2)*(N+2)+ j*(N+2) +k)
-#define SWAP(x0,x) {float * tmp=x0;x0=x;x=tmp;}
-#define FOR_EACH_CELL for ( i=1 ; i<=N ; i++ ) { for ( j=1 ; j<=N ; j++ ) { for ( k=1;k<=N; k++){
-#define END_FOR }}}
-
-extern void dens_step ( int N, float * x, float * x0, float * u, float * v, float * w, float diff, float dt );
-extern void vel_step ( int N, float * u, float * v, float *w, float * u0, float * v0, float *w0,float visc, float dt );
+#define IX(i,j,k) (i*(N)*(N)+ j*(N) +k)
+#define SWAP(a,b,tmp) {tmp = a; a = b; b = tmp;}
+#define FOR_EACH_GRID(N,i,j,k)	\
+		for(i = 0; i < N; i++)	\
+for(j = 0; j < N; j++) 	\
+for(k = 0; k < N; k++)
 
 #include <FL/gl.h>
 
@@ -212,7 +211,7 @@ void ParticleSystem::computeForcesAndUpdateParticles(float t)
 		// TODO
 		if(t- prevT > 0.03){
 				float deltaT = t - prevT;
-				ss.update_smoke(deltaT *5);
+				ss.update_fluid(deltaT);
 				if( t - prevT > .04 )
 						printf("(!!) Dropped Frame %lf (!!)\n", t-prevT);
 				prevT = t;
@@ -1054,22 +1053,21 @@ void ParticleSystem::pipe_computeForcesAndUpdateParticles(float t){
 		}
 }
 
-void SmokeSystem::draw_smoke(void){
+void FluidSystem::draw_fluid(void){
 		int i, j,k;
 		float x, y , z, h;
 		float d[8];
-
 
 		h = 5.0f/N;
 		glDisable(GL_LIGHTING);
 
 		glBegin ( GL_QUADS );
 
-		for ( i=0 ; i<=N ; i++ ) {
+		for ( i=1 ; i<N-1 ; i++ ) {
 				x = (i-0.5f)*h;
-				for ( j=0 ; j<=N ; j++ ) {
+				for ( j=1 ; j<N-1 ; j++ ) {
 						y = (j-0.5f)*h;
-						for(k = 0; k <= N; k++){
+						for(k = 1; k < N-1; k++){
 								z = (k -0.5f)*h;
 								d[0] = dens[IX(i,j,k)];
 								d[1] = dens[IX(i,j,k-1)];
@@ -1081,8 +1079,9 @@ void SmokeSystem::draw_smoke(void){
 								d[7] = dens[IX(i-1,j+1,k)];
 								int t;
 								for(t=0;t<8;t++)
-										if(d[t] > 0.05)
+										if(d[t] > 0.5){
 												break;
+										}
 								if(t >= 8)
 										continue;
 								//	d000 = dens[IX(i,j)];
@@ -1100,7 +1099,6 @@ void SmokeSystem::draw_smoke(void){
 								//glColor4f ( d11, d11, d11 ); glVertex3f ( x+h, y+h ,0);
 								//glColor4f ( d01, d01, d01 ); glVertex3f ( x, y+h ,0);
 								glColor4f(0.5,0.0,0.0,0.2);
-
 								glNormal3d( 1.0 ,0.0, 0.0);			// +x side
 								glVertex3d( x, y, z);
 								glVertex3d( x, y, z-h);
@@ -1145,31 +1143,158 @@ void SmokeSystem::draw_smoke(void){
 }
 
 
-void SmokeSystem::update_smoke(float dt){
-		int i, j,k, size = (N+2)*(N+2) *(N+2);
-		FOR_EACH_CELL
-				dens_prev[IX(i,j,k)] = 0.0f;
-				u_prev[IX(i,j,k)] = 0.0f;
-				v_prev[IX(i,j,k)] = 0.0f;
-				w_prev[IX(i,j,k)] = 0.0f;
-		END_FOR
-		//u_prev[IX(1,1,1)] = 0.0f;
-		//v_prev[IX(1,1,1)] = 0.0f;
-		//w_prev[IX(1,1,1)] = 1.0f;
-		dens_prev[IX(1,1,1)] = 10.0f;
+void FluidSystem::add_to_array(float* x, int index, float quantity)
+{
+		x[index] += quantity;
+}
 
-		vel_step ( N, u, v, w, u_prev, v_prev, w_prev ,visc, dt);
-		dens_step ( N, dens, dens_prev, u, v, w, diff, dt );
-		FOR_EACH_CELL
-				if(	dens[IX(i,j,k)] < 1.0f)
-						dens[IX(i,j,k)] = 0.0f;
-		END_FOR
-	//FOR_EACH_CELL
-	//if(dens[IX(i,j,k)] > 1.0)
-	//	printf("%d,%d%d:%f\n",i,j,k,dens[IX(i,j,k)]);
-	//if(u[IX(i,j,k)] > 1.0)
-	//	printf("u:%d,%d,%d:%f\n",i,j,k,u[IX(i,j,k)]);
-	//if(v[IX(i,j,k)] > 1.0)
-	//	printf("v:%d,%d,%d:%f\n",i,j,k,v[IX(i,j,k)]);
-	//END_FOR
+void FluidSystem::gs_solver(int N, float* x, float *x0, float rate, float div)
+{
+		int i,j,k,iter;
+		for(iter = 0; iter < 15; iter++){
+				FOR_EACH_GRID(N,i,j,k)
+				{
+						x[IX(i,j,k)] = (x0[IX(i,j,k)] +
+										rate * (x[IX(i-1,j,k)] + x[IX(i+1,j,k)] +
+												x[IX(i,j-1,k)] + x[IX(i,j+1,k)] +
+												x[IX(i,j,k-1)] + x[IX(i,j,k+1)]
+											   )
+									   )/div;
+				}
+
+		}
+}
+
+void FluidSystem::project(int N, float *u, float *v, float *w, float *g, float *g0)
+{
+	int i,j,k;
+	FOR_EACH_GRID(N,i,j,k)
+	{
+		 g0[IX(i,j,k)]= -0.5 * (u[IX(i+1,j,k)] - u[IX(i-1,j,k)] +
+		 						v[IX(i,j+1,k)] - v[IX(i,j-1,k)] +
+								w[IX(i,j,k+1)] - w[IX(i,j,k-1)])/N;
+		 g[IX(i,j,k)] = 0;
+	}
+	//use gs_solver to iteratively compute gradient
+	gs_solver(N, g, g0, 1, 6);
+	
+	FOR_EACH_GRID(N,i,j,k)
+	{
+		u[IX(i,j,k)] -= 0.5 * N * (g[IX(i+1,j,k)] - g[IX(i-1,j,k)]);
+		v[IX(i,j,k)] -= 0.5 * N * (g[IX(i,j+1,k)] - g[IX(i,j-1,k)]);
+		w[IX(i,j,k)] -= 0.5 * N * (g[IX(i,j,k+1)] - g[IX(i,j,k-1)]);
+	}
+}
+
+void FluidSystem::advect(int N, float *d, float *d0, float *u, float *v, float *w, float dt)
+{
+		int i,j,k;
+		float x,y,z;
+		int xi,yi,zi;
+		float xw, yw, zw;
+		float xwn, ywn, zwn;
+		//backward trace
+		//dt = dt * N;
+		//dt = dt*N;
+		//dt = 1;
+		FOR_EACH_GRID(N,i,j,k)
+		{
+			//which grid?
+			x = i - dt*u[IX(i,j,k)];
+			y = j - dt*v[IX(i,j,k)];
+			z = k - dt*w[IX(i,j,k)];
+			xi = (int)x; yi = (int)y; zi = (int)z;
+
+			//interpolate
+			if(xi <= 0 || yi <= 0 || zi <= 0 || xi >= N || yi >= N || zi >= N)//outside the grid
+					d[IX(i,j,k)] = 0.0;
+			else{//weighted sum of 8 grid
+				//weight
+				xwn = x - xi; ywn = y - yi; zwn = z - zi;
+				xw = 1.0 - xwn; yw = 1.0 - ywn;	zw = 1.0 - zwn;
+				//cout << "XW" << xw;
+				d[IX(i,j,k)] =	xw * yw * zw * d0[IX(xi,yi,zi)] +
+								xwn * yw * zw * d0[IX(xi+1,yi,zi)] +
+								xw * ywn * zw * d0[IX(xi,yi+1,zi)] +
+								xwn * ywn * zw * d0[IX(xi+1,yi+1,zi)] +
+								xw * yw * zwn * d0[IX(xi,yi,zi+1)] +
+								xwn * yw * zwn * d0[IX(xi+1,yi,zi+1)] +
+								xw * ywn * zwn * d0[IX(xi,yi+1,zi+1)] +
+								xwn * ywn * zwn * d0[IX(xi+1,yi+1,zi+1)];
+			}
+		}
+}
+void FluidSystem::diffuse(int N, float *d, float *d0, float rate)
+{
+		gs_solver(N, d, d0, rate, 1+6*rate);
+}
+void FluidSystem::dens_step(int N, float *d, float *d0, float *u, float *v, float *w, float dif, float dt)
+{
+		float *tmp;
+		SWAP(d0, d, tmp);
+		diffuse(N, d, d0, dif);
+		SWAP(d0, d, tmp);
+		advect(N, d, d0, u, v, w, dt);
+}
+void FluidSystem::vel_step(int N, float *u, float *v, float *w, float *u0, float *v0, float *w0, float vis, float dt)
+{
+		float *tmp;
+		int i,j,k;
+		SWAP(u, u0, tmp); SWAP(v, v0, tmp);	SWAP(w, w0, tmp);
+		diffuse(N, u, u0, vis);
+		diffuse(N, v, v0, vis);
+		diffuse(N, w, w0, vis);
+
+		project(N, u, v, w, u0, v0);
+//		float test = 0;
+//	FOR_EACH_GRID(N,i,j,k)
+//	{
+//		test+= abs(u[IX(i,j,k)]);
+//		test+= abs(v[IX(i,j,k)]);
+//		test+= abs(w[IX(i,j,k)]);
+	//	if(u[IX(i,j,k)] > 0.0){
+	//			cout << "AFTERP"<< i << ","<< j << "," << k <<":"<< u[IX(i,j,k)] << ";";
+		//}
+//	}
+//	cout << test<<endl;
+		
+		SWAP(u0, u, tmp);
+		SWAP(v0, v, tmp);
+		SWAP(w0, w, tmp);
+		advect(N, u, u0, u0, v0, w0, dt);
+		advect(N, v, v0, u0, v0, w0, dt);
+		advect(N, w, w0, u0, v0, w0, dt);
+		project(N, u, v, w, u0, v0);
+}
+void FluidSystem::update_fluid(float dt){
+	float *tmp;
+	int i,j,k;
+	//SWAP(u, u0, tmp); SWAP(v, v0, tmp);	SWAP(w, w0, tmp);
+	vel_step ( N, u, v, w, u0, v0, w0, visc, dt );
+	//SWAP(dens, dens0,tmp);
+	dens_step (N, dens, dens0, u, v, w, diff, dt );
+
+	float test;
+	//smoke decay
+	FOR_EACH_GRID(N,i,j,k)
+	{
+		test+= (u[IX(i,j,k)]);
+		test+= (v[IX(i,j,k)]);
+		test+= (w[IX(i,j,k)]);
+
+		if(dens[IX(i,j,k)] > 0.0){
+			cout << i << ","<< j << "," << k <<":"<< dens[IX(i,j,k)] << ";";
+		}
+		if(dens[IX(i,j,k)] < 0.01){
+				dens[IX(i,j,k)] = 0;
+		}
+		u[IX(i,j,k)] *= 0.8;
+		v[IX(i,j,k)] *= 0.8;
+		w[IX(i,j,k)] *= 0.8;
+
+	//	if(u[IX(i,j,k)] > 0.0){
+	//			cout << i << ","<< j << "," << k <<":"<< u[IX(i,j,k)] << ";";
+	//	}
+	}
+	cout << test << endl;
 }

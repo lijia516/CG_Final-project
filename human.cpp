@@ -377,7 +377,7 @@ void Human::draw()
     glPopMatrix();
     
 		ParticleSystem *ps = ModelerApplication::Instance()->GetParticleSystem();
-		ps->ss.draw_smoke();
+		ps->ss.draw_fluid();
     
   //  std::cout<<"ori:" << ParticleSystem::particleOrigin[0] << "," << ParticleSystem::particleOrigin[1] << "," << ParticleSystem::particleOrigin[2] << std::endl;
 
