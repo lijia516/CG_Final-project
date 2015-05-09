@@ -9,12 +9,12 @@
 #include <cmath>
 #include <vector>
 #include <map>
-#define IX(i,j,k) (i*(N)*(N)+ j*(N) +k)
+#define IX(i,j,k) (i*(N+2)*(N+2)+ j*(N+2) +k)
 #define SWAP(a,b,tmp) {tmp = a; a = b; b = tmp;}
 #define FOR_EACH_GRID(N,i,j,k)	\
-		for(i = 0; i < N; i++)	\
-for(j = 0; j < N; j++) 	\
-for(k = 0; k < N; k++)
+		for(i = 1; i <= N; i++)	\
+for(j = 1; j <= N; j++) 	\
+for(k = 1; k <= N; k++)
 
 #include <FL/gl.h>
 
@@ -1055,8 +1055,8 @@ void ParticleSystem::pipe_computeForcesAndUpdateParticles(float t){
 
 void FluidSystem::draw_fluid(void){
 		int i, j,k;
-		float x, y , z, h;
-		float d[8];
+		double x, y , z, h;
+		double d[8];
 
 		h = 5.0f/N;
 		glDisable(GL_LIGHTING);
@@ -1079,7 +1079,7 @@ void FluidSystem::draw_fluid(void){
 								d[7] = dens[IX(i-1,j+1,k)];
 								int t;
 								for(t=0;t<8;t++)
-										if(d[t] > 0.5){
+										if(d[t] > 0.1){
 												break;
 										}
 								if(t >= 8)
@@ -1098,41 +1098,64 @@ void FluidSystem::draw_fluid(void){
 								//glColor4f ( d10, d10, d10 ); glVertex3f ( x+h, y ,0);
 								//glColor4f ( d11, d11, d11 ); glVertex3f ( x+h, y+h ,0);
 								//glColor4f ( d01, d01, d01 ); glVertex3f ( x, y+h ,0);
-								glColor4f(0.5,0.0,0.0,0.2);
 								glNormal3d( 1.0 ,0.0, 0.0);			// +x side
+								glColor4f(0.5,0.0,0.0,d[0]);
 								glVertex3d( x, y, z);
+								glColor4f(0.5,0.0,0.0,d[1]);
 								glVertex3d( x, y, z-h);
+								glColor4f(0.5,0.0,0.0,d[2]);
 								glVertex3d( x,  y+h,z-h);
+								glColor4f(0.5,0.0,0.0,d[3]);
 								glVertex3d( x,  y+h, z);
 
 								glNormal3d( 0.0 ,0.0, -1.0);		// -z side
+								glColor4f(0.5,0.0,0.0,d[1]);
 								glVertex3d( x, y, z-h);
+								glColor4f(0.5,0.0,0.0,d[5]);
 								glVertex3d( x-h,y,z-h);
+								glColor4f(0.5,0.0,0.0,d[6]);
 								glVertex3d( x-h,  y+h,z-h);
+								glColor4f(0.5,0.0,0.0,d[2]);
 								glVertex3d( x,  y+h,z-h);
 
 								glNormal3d(-1.0, 0.0, 0.0);			// -x side
+								glColor4f(0.5,0.0,0.0,d[5]);
 								glVertex3d(x-h,y,z-h);
+								glColor4f(0.5,0.0,0.0,d[4]);
 								glVertex3d(x-h,y, z);
+								glColor4f(0.5,0.0,0.0,d[7]);
 								glVertex3d(x-h, y+h , z);
+								glColor4f(0.5,0.0,0.0,d[6]);
 								glVertex3d(x-h, y+h,z-h);
 
 								glNormal3d( 0.0, 0.0, 1.0);			// +z side
+								glColor4f(0.5,0.0,0.0,d[4]);
 								glVertex3d(x-h,y, z);
+								glColor4f(0.5,0.0,0.0,d[0]);
 								glVertex3d( x,y, z);
+								glColor4f(0.5,0.0,0.0,d[3]);
 								glVertex3d( x,  y+h, z);
+								glColor4f(0.5,0.0,0.0,d[7]);
 								glVertex3d(x-h,  y+h, z);
 
 								glNormal3d( 0.0, 1.0, 0.0);			// top (+y)
+								glColor4f(0.5,0.0,0.0,d[3]);
 								glVertex3d( x, y+ h, z);
+								glColor4f(0.5,0.0,0.0,d[2]);
 								glVertex3d( x, y+ h,z-h);
+								glColor4f(0.5,0.0,0.0,d[6]);
 								glVertex3d(x-h, y+ h,z-h);
+								glColor4f(0.5,0.0,0.0,d[7]);
 								glVertex3d(x-h, y+ h, z);
 
 								glNormal3d( 0.0,-1.0, 0.0);			// bottom (-y)
+								glColor4f(0.5,0.0,0.0,d[0]);
 								glVertex3d( x,y, z);
+								glColor4f(0.5,0.0,0.0,d[4]);
 								glVertex3d(x-h,y, z);
+								glColor4f(0.5,0.0,0.0,d[5]);
 								glVertex3d(x-h,y,z-h);
+								glColor4f(0.5,0.0,0.0,d[1]);
 								glVertex3d( x,y,z-h);
 						}
 				}
@@ -1143,15 +1166,15 @@ void FluidSystem::draw_fluid(void){
 }
 
 
-void FluidSystem::add_to_array(float* x, int index, float quantity)
+void FluidSystem::add_to_array(double* x, int index, double quantity)
 {
 		x[index] += quantity;
 }
 
-void FluidSystem::gs_solver(int N, float* x, float *x0, float rate, float div)
+void FluidSystem::gs_solver(int N, double* x, double *x0, double rate, double div)
 {
 		int i,j,k,iter;
-		for(iter = 0; iter < 15; iter++){
+		for(iter = 0; iter < 20; iter++){
 				FOR_EACH_GRID(N,i,j,k)
 				{
 						x[IX(i,j,k)] = (x0[IX(i,j,k)] +
@@ -1165,80 +1188,149 @@ void FluidSystem::gs_solver(int N, float* x, float *x0, float rate, float div)
 		}
 }
 
-void FluidSystem::project(int N, float *u, float *v, float *w, float *g, float *g0)
-{
-	int i,j,k;
-	FOR_EACH_GRID(N,i,j,k)
-	{
-		 g0[IX(i,j,k)]= -0.5 * (u[IX(i+1,j,k)] - u[IX(i-1,j,k)] +
-		 						v[IX(i,j+1,k)] - v[IX(i,j-1,k)] +
-								w[IX(i,j,k+1)] - w[IX(i,j,k-1)])/N;
-		 g[IX(i,j,k)] = 0;
-	}
-	//use gs_solver to iteratively compute gradient
-	gs_solver(N, g, g0, 1, 6);
-	
-	FOR_EACH_GRID(N,i,j,k)
-	{
-		u[IX(i,j,k)] -= 0.5 * N * (g[IX(i+1,j,k)] - g[IX(i-1,j,k)]);
-		v[IX(i,j,k)] -= 0.5 * N * (g[IX(i,j+1,k)] - g[IX(i,j-1,k)]);
-		w[IX(i,j,k)] -= 0.5 * N * (g[IX(i,j,k+1)] - g[IX(i,j,k-1)]);
-	}
-}
-
-void FluidSystem::advect(int N, float *d, float *d0, float *u, float *v, float *w, float dt)
+void FluidSystem::project(int N, double *u, double *v, double *w, double *g, double *g0)
 {
 		int i,j,k;
-		float x,y,z;
-		int xi,yi,zi;
-		float xw, yw, zw;
-		float xwn, ywn, zwn;
-		//backward trace
-		//dt = dt * N;
-		//dt = dt*N;
-		//dt = 1;
+		double h = 1.0/N;
 		FOR_EACH_GRID(N,i,j,k)
 		{
-			//which grid?
-			x = i - dt*u[IX(i,j,k)];
-			y = j - dt*v[IX(i,j,k)];
-			z = k - dt*w[IX(i,j,k)];
-			xi = (int)x; yi = (int)y; zi = (int)z;
+				g0[IX(i,j,k)]= -0.5 *h* (u[IX(i+1,j,k)] - u[IX(i-1,j,k)] +
+										v[IX(i,j+1,k)] - v[IX(i,j-1,k)] +
+										w[IX(i,j,k+1)] - w[IX(i,j,k-1)]);
+				g[IX(i,j,k)] = 0;
+		}
+		/*
+		   FOR_EACH_GRID(N,i,j,k)
+		   {
 
-			//interpolate
-			if(xi <= 0 || yi <= 0 || zi <= 0 || xi >= N || yi >= N || zi >= N)//outside the grid
-					d[IX(i,j,k)] = 0.0;
-			else{//weighted sum of 8 grid
-				//weight
-				xwn = x - xi; ywn = y - yi; zwn = z - zi;
-				xw = 1.0 - xwn; yw = 1.0 - ywn;	zw = 1.0 - zwn;
-				//cout << "XW" << xw;
-				d[IX(i,j,k)] =	xw * yw * zw * d0[IX(xi,yi,zi)] +
-								xwn * yw * zw * d0[IX(xi+1,yi,zi)] +
-								xw * ywn * zw * d0[IX(xi,yi+1,zi)] +
-								xwn * ywn * zw * d0[IX(xi+1,yi+1,zi)] +
-								xw * yw * zwn * d0[IX(xi,yi,zi+1)] +
-								xwn * yw * zwn * d0[IX(xi+1,yi,zi+1)] +
-								xw * ywn * zwn * d0[IX(xi,yi+1,zi+1)] +
-								xwn * ywn * zwn * d0[IX(xi+1,yi+1,zi+1)];
-			}
+		   cout << "g0" << i << "," << j << "," << k <<":"<< g0[IX(i,j,k)] << ";";
+		   }
+		   cout << endl;
+		 */
+		//use gs_solver to iteratively compute gradient
+		gs_solver(N, g, g0, 1, 6);
+		/*
+		   FOR_EACH_GRID(N,i,j,k)
+		   {
+
+		   cout << "g" << i << "," << j << "," << k <<":"<< g[IX(i,j,k)] << ";";
+		   }
+		   cout << endl;
+		 */
+		FOR_EACH_GRID(N,i,j,k)
+		{
+				u[IX(i,j,k)] -= 0.5 * N * (g[IX(i+1,j,k)] - g[IX(i-1,j,k)]);
+				v[IX(i,j,k)] -= 0.5 * N * (g[IX(i,j+1,k)] - g[IX(i,j-1,k)]);
+				w[IX(i,j,k)] -= 0.5 * N * (g[IX(i,j,k+1)] - g[IX(i,j,k-1)]);
 		}
 }
-void FluidSystem::diffuse(int N, float *d, float *d0, float rate)
+
+void FluidSystem::advect(int N, double *d, double *d0, double *u, double *v, double *w, double dt)
+{
+		int i,j,k;
+		double x,y,z;
+		int xi,yi,zi;
+		double xw, yw, zw;
+		double xwn, ywn, zwn;
+		//backward trace
+		//dt = dt * N;
+		//dt = 1;
+		dt = dt * N;
+	//	cout << dt <<endl;
+		FOR_EACH_GRID(N,i,j,k)
+		{
+				//which grid?
+				x = i - dt*u[IX(i,j,k)];
+				y = j - dt*v[IX(i,j,k)];
+				z = k - dt*w[IX(i,j,k)];
+				//warp test
+
+				//interpolate
+				//if(xi <= 0 || yi <= 0 || zi <= 0 || xi >= N || yi >= N || zi >= N)//outside the grid
+				//		d[IX(i,j,k)] = 0.0;
+				//else{//weighted sum of 8 grid
+				//weight
+				if(x <= 0 || y <= 0 || z <= 0 || x >= N || y >= N || z >= N){//outside the grid
+						d[IX(i,j,k)] = 0.0;
+						continue;
+				}
+		//		printf("%d %d %d\n", i,j,k);
+		//		printf("%f\n", w[IX(i,j,k)]);
+		//		printf("%f %f %f\n", x,y, z);
+				xi = (int)x; yi = (int)y; zi = (int)z;
+				xwn = x - xi; ywn = y - yi; zwn = z - zi;
+				xw = 1.0 - xwn; yw = 1.0 - ywn;	zw = 1.0 - zwn;
+
+		//		printf("%d %d %d\n", xi,yi, zi);
+
+				d[IX(i,j,k)] =	xw * yw * zw * d0[IX(xi,yi,zi)] +
+						xwn * yw * zw * d0[IX(xi+1,yi,zi)] +
+						xw * ywn * zw * d0[IX(xi,yi+1,zi)] +
+						xwn * ywn * zw * d0[IX(xi+1,yi+1,zi)] +
+						xw * yw * zwn * d0[IX(xi,yi,zi+1)] +
+						xwn * yw * zwn * d0[IX(xi+1,yi,zi+1)] +
+						xw * ywn * zwn * d0[IX(xi,yi+1,zi+1)] +
+						xwn * ywn * zwn * d0[IX(xi+1,yi+1,zi+1)];
+			//			cout<<xwn <<","<< ywn  <<","<<zwn <<","<< d0[IX(xi+1,yi+1,zi+1)]<< endl;
+		//		printf("%f\n\n",d[IX(i,j,k)]);
+		}
+
+		/*
+		   xi = (int)x; yi = (int)y; zi = (int)z;
+		   xi = xi < 1 ? 1 : xi > N? N: xi;
+		   xi = xi < 1 ? 1 : xi > N? N: xi;
+		   yi = yi < 1 ? 1 : yi > N? N: yi;
+		   zi = zi < 1 ? 1 : zi > N? N: zi;
+		   xwn = x - xi; ywn = y - yi; zwn = z - zi;
+		   xwn = (xwn > 1.0)||(xwn < 0.0) ? 0.0 : xwn;
+		   ywn = (ywn > 1.0)||(ywn < 0.0) ? 0.0 : ywn;
+		   zwn = (zwn > 1.0)||(zwn < 0.0) ? 0.0 : zwn;
+		   xw = 1.0 - xwn; yw = 1.0 - ywn;	zw = 1.0 - zwn;
+
+		   d[IX(i,j,k)] =	xw * yw * zw * d0[IX(xi,yi,zi)] +
+		   xwn * yw * zw * d0[IX(xi+1,yi,zi)] +
+		   xw * ywn * zw * d0[IX(xi,yi+1,zi)] +
+		   xwn * ywn * zw * d0[IX(xi+1,yi+1,zi)] +
+		   xw * yw * zwn * d0[IX(xi,yi,zi+1)] +
+		   xwn * yw * zwn * d0[IX(xi+1,yi,zi+1)] +
+		   xw * ywn * zwn * d0[IX(xi,yi+1,zi+1)] +
+		   xwn * ywn * zwn * d0[IX(xi+1,yi+1,zi+1)];
+		   }
+		   int wrap = N-1;
+		   xi = xi & wrap;
+		   yi = yi & wrap;
+		   zi = zi & wrap;
+		   int		xi1 = (xi + 1) & wrap;
+		   int		yi1 = (yi + 1) & wrap;
+		   int		zi1 = (zi + 1) & wrap;
+		//cout << "XW" << xw;
+		d[IX(i,j,k)] =	xw * yw * zw * d0[IX(xi,yi,zi)] +
+		xwn * yw * zw * d0[IX(xi1,yi,zi)] +
+		xw * ywn * zw * d0[IX(xi,yi1,zi)] +
+		xwn * ywn * zw * d0[IX(xi1,yi1,zi)] +
+		xw * yw * zwn * d0[IX(xi,yi,zi1)] +
+		xwn * yw * zwn * d0[IX(xi1,yi,zi1)] +
+		xw * ywn * zwn * d0[IX(xi,yi1,zi1)] +
+		xwn * ywn * zwn * d0[IX(xi1,yi1,zi1)];
+		}
+		 */
+}
+void FluidSystem::diffuse(int N, double *d, double *d0, double rate)
 {
 		gs_solver(N, d, d0, rate, 1+6*rate);
 }
-void FluidSystem::dens_step(int N, float *d, float *d0, float *u, float *v, float *w, float dif, float dt)
+void FluidSystem::dens_step(int N, double *d, double *d0, double *u, double *v, double *w, double dif, double dt)
 {
-		float *tmp;
+		double *tmp;
+		int i,j,k;
 		SWAP(d0, d, tmp);
 		diffuse(N, d, d0, dif);
 		SWAP(d0, d, tmp);
 		advect(N, d, d0, u, v, w, dt);
 }
-void FluidSystem::vel_step(int N, float *u, float *v, float *w, float *u0, float *v0, float *w0, float vis, float dt)
+void FluidSystem::vel_step(int N, double *u, double *v, double *w, double *u0, double *v0, double *w0, double vis, double dt)
 {
-		float *tmp;
+		double *tmp;
 		int i,j,k;
 		SWAP(u, u0, tmp); SWAP(v, v0, tmp);	SWAP(w, w0, tmp);
 		diffuse(N, u, u0, vis);
@@ -1246,55 +1338,99 @@ void FluidSystem::vel_step(int N, float *u, float *v, float *w, float *u0, float
 		diffuse(N, w, w0, vis);
 
 		project(N, u, v, w, u0, v0);
-//		float test = 0;
-//	FOR_EACH_GRID(N,i,j,k)
-//	{
-//		test+= abs(u[IX(i,j,k)]);
-//		test+= abs(v[IX(i,j,k)]);
-//		test+= abs(w[IX(i,j,k)]);
-	//	if(u[IX(i,j,k)] > 0.0){
-	//			cout << "AFTERP"<< i << ","<< j << "," << k <<":"<< u[IX(i,j,k)] << ";";
-		//}
-//	}
-//	cout << test<<endl;
-		
 		SWAP(u0, u, tmp);
 		SWAP(v0, v, tmp);
 		SWAP(w0, w, tmp);
+//		cout << "!!!!" << w[IX(21,22,12)]<<endl;
 		advect(N, u, u0, u0, v0, w0, dt);
+		cout << "!!!!" <<endl;
 		advect(N, v, v0, u0, v0, w0, dt);
 		advect(N, w, w0, u0, v0, w0, dt);
+		   FOR_EACH_GRID(N,i,j,k)
+		   {
+		   if(u[IX(i,j,k)] != 0.0)
+			   	cout << "u:"<<i << "," << j << "," << k <<":"<< u[IX(i,j,k)] << ";" <<endl;
+		   if(v[IX(i,j,k)] != 0.0)
+			   	cout << "v:"<<i << "," << j << "," << k <<":"<< v[IX(i,j,k)] << ";" <<endl;
+		   if(w[IX(i,j,k)] != 0.0)
+			   	cout << "w:"<<i << "," << j << "," << k <<":"<< w[IX(i,j,k)] << ";" <<endl;
+		   }
+
 		project(N, u, v, w, u0, v0);
+		/*
+		   FOR_EACH_GRID(N,i,j,k)
+		   {
+		   if(u[IX(i,j,k)] > 0.1)
+		   cout << "u:"<<i << "," << j << "," << k <<":"<< u[IX(i,j,k)] << ";" <<endl;
+		   }
+		 */
 }
-void FluidSystem::update_fluid(float dt){
-	float *tmp;
-	int i,j,k;
-	//SWAP(u, u0, tmp); SWAP(v, v0, tmp);	SWAP(w, w0, tmp);
-	vel_step ( N, u, v, w, u0, v0, w0, visc, dt );
-	//SWAP(dens, dens0,tmp);
-	dens_step (N, dens, dens0, u, v, w, diff, dt );
-
-	float test;
-	//smoke decay
-	FOR_EACH_GRID(N,i,j,k)
-	{
-		test+= (u[IX(i,j,k)]);
-		test+= (v[IX(i,j,k)]);
-		test+= (w[IX(i,j,k)]);
-
-		if(dens[IX(i,j,k)] > 0.0){
-			cout << i << ","<< j << "," << k <<":"<< dens[IX(i,j,k)] << ";";
+void FluidSystem::update_fluid(double dt){
+		double *tmp;
+		int i,j,k;
+		
+		add_to_array(dens, IX(2,2,2), 50.0);
+		add_to_array(u, IX(1,1,1), 5.0);
+		add_to_array(v, IX(1,1,1), 5.0);
+		add_to_array(w, IX(1,1,1), 5.0);
+		add_to_array(u, IX(2,2,2), 5.0);
+		add_to_array(v, IX(2,2,2), 5.0);
+		add_to_array(w, IX(2,2,2), 5.0);
+		vel_step ( N, u, v, w, u0, v0, w0, visc, dt);
+		//cout << "!!" <<endl;
+		FOR_EACH_GRID(N,i,j,k){
+				u[IX(i,j,k)] *= 0.99;
+				v[IX(i,j,k)] *= 0.99;
+				w[IX(i,j,k)] *= 0.99;
+				if(u[IX(i,j,k)] < 0.01){
+						u[IX(i,j,k)] = 0;
+				}
+				if(v[IX(i,j,k)] < 0.01){
+						v[IX(i,j,k)] = 0;
+				}
+				if(w[IX(i,j,k)] < 0.01){
+						w[IX(i,j,k)] = 0;
+				}
+				//disturb
+				if(dens[IX(i,j,k)] < 0.1){
+						dens[IX(i,j,k)] = 0;
+				}
 		}
-		if(dens[IX(i,j,k)] < 0.01){
-				dens[IX(i,j,k)] = 0;
-		}
-		u[IX(i,j,k)] *= 0.8;
-		v[IX(i,j,k)] *= 0.8;
-		w[IX(i,j,k)] *= 0.8;
+	//	SWAP(dens, dens0,tmp);
+		dens_step (N, dens, dens0, u, v, w, diff, dt);
 
-	//	if(u[IX(i,j,k)] > 0.0){
-	//			cout << i << ","<< j << "," << k <<":"<< u[IX(i,j,k)] << ";";
-	//	}
-	}
+		double test = 0;
+		//smoke decay
+		FOR_EACH_GRID(N,i,j,k)
+		{
+
+						if(dens[IX(i,j,k)] > 0.1){
+							cout << i << ","<< j << "," << k <<":"<< dens[IX(i,j,k)] << ";";
+						}
+				//	if(dens[IX(i,j,k)] < 0.01){
+				//			dens[IX(i,j,k)] = 0;
+				//	}
+				//	u[IX(i,j,k)] *= 0.8;
+				//	v[IX(i,j,k)] *= 0.8;
+				//	w[IX(i,j,k)] *= 0.8;
+			//	test+=(u[IX(i,j,k)]);
+			//	test+= (v[IX(i,j,k)]);
+			//	test+= (w[IX(i,j,k)]);
+				//test+= abs(u[IX(i,j,k)]);
+				//test+= abs(v[IX(i,j,k)]);
+				//test+= abs(w[IX(i,j,k)]);
+					test+= dens[IX(i,j,k)];
+
+				//	if(u[IX(i,j,k)] != 0.0){
+				//		cout << i << ","<< j << "," << k <<":"<< u[IX(i,j,k)] << ";";
+				//	}
+				//	if(v[IX(i,j,k)] != 0.0){
+				//			cout << i << ","<< j << "," << k <<":"<< v[IX(i,j,k)] << ";";
+				//	}
+				//	if(w[IX(i,j,k)] != 0.0){
+				//			cout << i << ","<< j << "," << k <<":"<< w[IX(i,j,k)] << ";";
+				//	}
+		}
 	cout << test << endl;
+		//cout << u[IX(1,1,1)] << endl;
 }
