@@ -54,7 +54,7 @@ class FluidSystem{
 						N = size;
 						//default
 						dt = 0.1f;
-						diff = 0.1f;
+						diff = 0.05f;
 						visc = 0.1f;
 						u = (double *) malloc ( _size*sizeof(double) );
 						v = (double *) malloc ( _size*sizeof(double) );
@@ -66,10 +66,11 @@ class FluidSystem{
 						dens0 = (double *) malloc ( _size*sizeof(double) );
 						for ( i=0 ; i <_size ; i++ ) {
 								w[i] = w0[i] = u[i] = v[i] = u0[i] = v0[i] = dens[i] = dens0[i] = 0.0f;
+								v[i] = 0.05;
 						}
 						//default moving up
-						v[IX(N/2,1,N/2)] = 5.0f;
-						dens[IX(N/2,1,N/2)] = 50.0f;
+						v[IX(N/2,1,N/2)] = 20.0f;
+						dens[IX(N/2,1,N/2)] = 200.0f;
 						/*
 						   for ( i=0 ; i <_size ; i++ ) {
 						   if(u[i] != 0)
@@ -97,7 +98,7 @@ class ParticleSystem {
 
 				/** Destructor **/
 				virtual ~ParticleSystem();
-				FluidSystem ss = FluidSystem(60);
+				FluidSystem ss = FluidSystem(80);
 
 				/** Simulation fxns **/
 				// This fxn should render all particles in the system,

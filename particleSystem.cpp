@@ -1080,7 +1080,7 @@ void FluidSystem::draw_fluid(void){
 								int t;
 								float opa = 0.2;
 								for(t=0;t<8;t++)
-										if(d[t] > 0.1){
+										if(d[t] > 0.05){
 												break;
 										}
 								if(t >= 8)
@@ -1100,63 +1100,63 @@ void FluidSystem::draw_fluid(void){
 								//glColor4f ( d11, d11, d11 ); glVertex3f ( x+h, y+h ,0);
 								//glColor4f ( d01, d01, d01 ); glVertex3f ( x, y+h ,0);
 								glNormal3d( 1.0 ,0.0, 0.0);			// +x side
-								glColor4f(d[0],d[0],d[0],opa);
+								glColor4f(d[0],d[0],d[0],d[0]>opa?opa:d[0]);
 								glVertex3d( x, y, z);
-								glColor4f(d[1],d[1],d[1],opa);
+								glColor4f(d[1],d[1],d[1],d[1]>opa?opa:d[1]);
 								glVertex3d( x, y, z-h);
-								glColor4f(d[2],d[2],d[2],opa);
+								glColor4f(d[2],d[2],d[2],d[2]>opa?opa:d[2]);
 								glVertex3d( x,  y+h,z-h);
-								glColor4f(d[3],d[3],d[3],opa);
+								glColor4f(d[3],d[3],d[3],d[3]>opa?opa:d[3]);
 								glVertex3d( x,  y+h, z);
 
 								glNormal3d( 0.0 ,0.0, -1.0);		// -z side
-								glColor4f(d[1],d[1],d[1],opa);
+								glColor4f(d[1],d[1],d[1],d[1]>opa?opa:d[1]);
 								glVertex3d( x, y, z-h);
-								glColor4f(d[5],d[5],d[5],opa);
+								glColor4f(d[5],d[5],d[5],d[5]>opa?opa:d[5]);
 								glVertex3d( x-h,y,z-h);
-								glColor4f(d[6],d[6],d[6],opa);
+								glColor4f(d[6],d[6],d[6],d[6]>opa?opa:d[6]);
 								glVertex3d( x-h,  y+h,z-h);
-								glColor4f(d[2],d[2],d[2],opa);
+								glColor4f(d[2],d[2],d[2],d[2]>opa?opa:d[2]);
 								glVertex3d( x,  y+h,z-h);
 
 								glNormal3d(-1.0, 0.0, 0.0);			// -x side
-								glColor4f(d[5],d[5],d[5],opa);
+								glColor4f(d[5],d[5],d[5],d[5]>opa?opa:d[5]);
 								glVertex3d(x-h,y,z-h);
-								glColor4f(d[4],d[4],d[4],opa);
+								glColor4f(d[4],d[4],d[4],d[4]>opa?opa:d[4]);
 								glVertex3d(x-h,y, z);
-								glColor4f(d[7],d[7],d[7],opa);
+								glColor4f(d[7],d[7],d[7],d[7]>opa?opa:d[7]);
 								glVertex3d(x-h, y+h , z);
-								glColor4f(d[6],d[6],d[6],opa);
+								glColor4f(d[6],d[6],d[6],d[6]>opa?opa:d[6]);
 								glVertex3d(x-h, y+h,z-h);
 
 								glNormal3d( 0.0, 0.0, 1.0);			// +z side
-								glColor4f(d[4],d[4],d[4],opa);
+								glColor4f(d[4],d[4],d[4],d[4]>opa?opa:d[4]);
 								glVertex3d(x-h,y, z);
-								glColor4f(d[0],d[0],d[0],opa);
+								glColor4f(d[0],d[0],d[0],d[0]>opa?opa:d[0]);
 								glVertex3d( x,y, z);
-								glColor4f(d[3],d[3],d[3],opa);
+								glColor4f(d[3],d[3],d[3],d[3]>opa?opa:d[3]);
 								glVertex3d( x,  y+h, z);
-								glColor4f(d[7],d[7],d[7],opa);
+								glColor4f(d[7],d[7],d[7],d[7]>opa?opa:d[7]);
 								glVertex3d(x-h,  y+h, z);
 
 								glNormal3d( 0.0, 1.0, 0.0);			// top (+y)
-								glColor4f(d[3],d[3],d[3],opa);
+								glColor4f(d[3],d[3],d[3],d[3]>opa?opa:d[3]);
 								glVertex3d( x, y+ h, z);
-								glColor4f(d[2],d[2],d[2],opa);
+								glColor4f(d[2],d[2],d[2],d[2]>opa?opa:d[2]);
 								glVertex3d( x, y+ h,z-h);
-								glColor4f(d[6],d[6],d[6],opa);
+								glColor4f(d[6],d[6],d[6],d[6]>opa?opa:d[6]);
 								glVertex3d(x-h, y+ h,z-h);
-								glColor4f(d[7],d[7],d[7],opa);
+								glColor4f(d[7],d[7],d[7],d[7]>opa?opa:d[7]);
 								glVertex3d(x-h, y+ h, z);
 
 								glNormal3d( 0.0,-1.0, 0.0);			// bottom (-y)
-								glColor4f(d[0],d[0],d[0],opa);
+								glColor4f(d[0],d[0],d[0],d[0]>opa?opa:d[0]);
 								glVertex3d( x,y, z);
-								glColor4f(d[4],d[4],d[4],opa);
+								glColor4f(d[4],d[4],d[4],d[4]>opa?opa:d[4]);
 								glVertex3d(x-h,y, z);
-								glColor4f(d[5],d[5],d[5],opa);
+								glColor4f(d[5],d[5],d[5],d[5]>opa?opa:d[5]);
 								glVertex3d(x-h,y,z-h);
-								glColor4f(d[1],d[1],d[1],opa);
+								glColor4f(d[1],d[1],d[1],d[1]>opa?opa:d[1]);
 								glVertex3d( x,y,z-h);
 						}
 				}
@@ -1368,23 +1368,35 @@ void FluidSystem::update_fluid(double dt){
 		int i,j,k;
 
 		//add fluid and pressure
-		add_to_array(dens, IX(N/2,1,N/2), 30.0);
-		add_to_array(v, IX(N/2,1,N/2), 5.0);
+		add_to_array(dens, IX(N/2,1,N/2), 50.0);
+		//add_to_array(v, IX(N/2,1,N/2), 5.0);
 
 		//disturbe
-		/*
+		double positive;
+		double negative;
 		FOR_EACH_GRID(N,i,j,k){
-			add_to_array(u, IX(i,j,k), 1.0);
-			add_to_array(v, IX(i,j,k), 1.0);
-			add_to_array(w, IX(i,j,k), 1.0);
+			positive = rand()/(double)(RAND_MAX) / 4;
+			negative = rand()/(double)(RAND_MAX+1) /4;
+			add_to_array(u, IX(i,j,k), positive +negative);
+			positive = rand()/(double)(RAND_MAX) / 4;
+			negative = rand()/(double)(RAND_MAX+1) /4;
+			add_to_array(v, IX(i,j,k), positive+negative);
+			positive = rand()/(double)(RAND_MAX)/4;
+			negative = rand()/(double)(RAND_MAX+1)/4;
+			add_to_array(w, IX(i,j,k), positive+negative);
+
+			//decay
+					if(dens[IX(i,j,k)] < 0.05){
+							dens[IX(i,j,k)] = 0;
+					}
 		}
-		*/
 
 		vel_step ( N, u, v, w, u0, v0, w0, visc, dt);
 
 		//cout << "!!" <<endl;
 
 		//decay
+		/*
 		FOR_EACH_GRID(N,i,j,k){
 			//	u[IX(i,j,k)] *= 0.99;
 			//	v[IX(i,j,k)] *= 0.99;
@@ -1403,6 +1415,7 @@ void FluidSystem::update_fluid(double dt){
 						dens[IX(i,j,k)] = 0;
 				}
 		}
+		*/
 	//	SWAP(dens, dens0,tmp);
 		dens_step (N, dens, dens0, u, v, w, diff, dt);
 
