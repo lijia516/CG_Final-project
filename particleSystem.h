@@ -16,7 +16,7 @@
 #ifndef __PARTICLE_SYSTEM_H__
 #define __PARTICLE_SYSTEM_H__
 
-#define IX(i,j,k) (i*(N+2)*(N+2)+ j*(N+2) +k)
+#define IX(i,j,k) ((i)*(N+2)*(N+2)+(j)*(N+2)+(k))
 #define FOR_EACH_GRID(N,i,j,k)	\
 		for(i = 1; i <= N; i++)	\
 for(j = 1; j <= N; j++) 	\
@@ -44,44 +44,38 @@ class FluidSystem{
 		public:
 				int N;
 				double dt, diff, visc;
-				double force, source;
-				int dvel;
 				double * u, * v, * u0, * v0;
 				double * w, * w0;
 				double * dens, * dens0;
+				int iteration_count = 15;
 				FluidSystem(int size){
 						int _size=(size+2)*(size+2)*(size+2);
-				int i,j,k;
-						dt = 0.1f;
-						diff = 0.0f;
-						visc = 0.0f;
-						force = 5.0f;
-						source = 20.0f;
+						int i,j,k;
 						N = size;
-						u			= (double *) malloc ( _size*sizeof(double) );
-						v			= (double *) malloc ( _size*sizeof(double) );
-						w			= (double *) malloc ( _size*sizeof(double) );
-						u0		= (double *) malloc ( _size*sizeof(double) );
-						v0		= (double *) malloc ( _size*sizeof(double) );
-						w0		= (double *) malloc ( _size*sizeof(double) );
-						dens		= (double *) malloc ( _size*sizeof(double) );	
-						dens0	= (double *) malloc ( _size*sizeof(double) );
+						//default
+						dt = 0.1f;
+						diff = 0.1f;
+						visc = 0.1f;
+						u = (double *) malloc ( _size*sizeof(double) );
+						v = (double *) malloc ( _size*sizeof(double) );
+						w = (double *) malloc ( _size*sizeof(double) );
+						u0 = (double *) malloc ( _size*sizeof(double) );
+						v0 = (double *) malloc ( _size*sizeof(double) );
+						w0 = (double *) malloc ( _size*sizeof(double) );
+						dens = (double *) malloc ( _size*sizeof(double) );	
+						dens0 = (double *) malloc ( _size*sizeof(double) );
 						for ( i=0 ; i <_size ; i++ ) {
 								w[i] = w0[i] = u[i] = v[i] = u0[i] = v0[i] = dens[i] = dens0[i] = 0.0f;
 						}
-						u[IX(1,1,1)] = 2.0f;
-						v[IX(1,1,1)] = 2.0f;
-						w[IX(1,1,1)] = 2.0f;
-						u[IX(2,2,2)] = 2.0f;
-						v[IX(2,2,2)] = 2.0f;
-						w[IX(2,2,2)] = 2.0f;
-						dens[IX(1,1,1)] = 20.0f;
+						//default moving up
+						v[IX(N/2,1,N/2)] = 5.0f;
+						dens[IX(N/2,1,N/2)] = 50.0f;
 						/*
-						for ( i=0 ; i <_size ; i++ ) {
-								if(u[i] != 0)
-								cout << i<<","<<u[i] << endl;
-						}
-						*/
+						   for ( i=0 ; i <_size ; i++ ) {
+						   if(u[i] != 0)
+						 	  cout << i<<","<<u[i] << endl;
+						   }
+						 */
 				}
 				void draw_fluid ( void );
 				void update_fluid(double dt);
@@ -103,8 +97,7 @@ class ParticleSystem {
 
 				/** Destructor **/
 				virtual ~ParticleSystem();
-				FluidSystem ss = FluidSystem(32);
-
+				FluidSystem ss = FluidSystem(60);
 
 				/** Simulation fxns **/
 				// This fxn should render all particles in the system,
